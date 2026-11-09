@@ -269,9 +269,9 @@ def test_flattened_mask_import_defaults_to_buffer_and_selects_result(
     expect(page.locator("#region-list .lv-region-item").first).to_contain_text("lossy_import")
     # One undo removes the whole import; redo brings it back with the same ids.
     ids = page.evaluate("window.__afmlabelWorkspace.selectedIds()")
-    page.keyboard.press("Control+z")
+    page.keyboard.press("ControlOrMeta+z")
     expect(page.locator("#region-list .lv-region-item")).to_have_count(0)
-    page.keyboard.press("Control+y")
+    page.keyboard.press("ControlOrMeta+y")
     expect(page.locator("#region-list .lv-region-item")).to_have_count(2)
     with httpx.Client(
         base_url=live_server_url, cookies=_cookies(page), headers=HEADERS, timeout=30

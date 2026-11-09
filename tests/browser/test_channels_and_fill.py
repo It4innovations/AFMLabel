@@ -165,9 +165,9 @@ def test_fill_tool_fills_enclosed_gap_and_fill_all(
     expect(page.locator("#region-list .lv-region-item.selected")).to_contain_text("grain 1")
 
     # Undo removes the filled region; redo restores it.
-    page.keyboard.press("Control+z")
+    page.keyboard.press("ControlOrMeta+z")
     expect(page.locator("#region-list .lv-region-item")).to_have_count(1)
-    page.keyboard.press("Control+y")
+    page.keyboard.press("ControlOrMeta+y")
     expect(page.locator("#region-list .lv-region-item")).to_have_count(2)
 
     # One dialog handler for the rest of the test: dismiss or accept on demand.
@@ -217,5 +217,5 @@ def test_fill_tool_fills_enclosed_gap_and_fill_all(
     expect(page.locator("#status-missing")).to_contain_text("0 px")
     page.keyboard.press("Escape")
     page.locator("#annotation-canvas").focus()
-    page.keyboard.press("Control+z")
+    page.keyboard.press("ControlOrMeta+z")
     expect(page.locator("#region-list .lv-region-item")).to_have_count(2)

@@ -22,6 +22,18 @@ TEST_PASSWORD = "correct-horse-battery"
 CSRF_HEADERS = {"X-Requested-With": "AFMLabel"}
 
 
+def pytest_configure(config: pytest.Config) -> None:
+    """Create the parent of ``--basetemp`` (``tmp/`` in a fresh clone).
+
+    pytest creates the base temporary directory itself but not its parents, so
+    without this a fresh checkout fails every ``tmp_path`` test with
+    FileNotFoundError until ``tmp/`` exists.
+    """
+    basetemp = config.option.basetemp
+    if basetemp:
+        Path(basetemp).resolve().parent.mkdir(parents=True, exist_ok=True)
+
+
 @pytest.fixture
 def app_settings(tmp_path: Path) -> AppSettings:
     return AppSettings(

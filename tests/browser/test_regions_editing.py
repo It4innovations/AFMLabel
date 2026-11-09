@@ -187,10 +187,10 @@ def test_multi_selection_delete_selected_and_clear(
     expect(rows).to_have_count(4)
     # Displayed top first: ids[3], ids[2], ids[1], ids[0].
     rows.nth(0).locator(".lv-region-name").click()
-    rows.nth(2).locator(".lv-region-name").click(modifiers=["Control"])
+    rows.nth(2).locator(".lv-region-name").click(modifiers=["ControlOrMeta"])
     expect(page.locator("#region-list .lv-region-item.selected")).to_have_count(2)
     assert set(page.evaluate("window.__afmlabelWorkspace.selectedIds()")) == {ids[3], ids[1]}
-    rows.nth(2).locator(".lv-region-name").click(modifiers=["Control"])  # toggle off
+    rows.nth(2).locator(".lv-region-name").click(modifiers=["ControlOrMeta"])  # toggle off
     expect(page.locator("#region-list .lv-region-item.selected")).to_have_count(1)
     rows.nth(3).locator(".lv-region-name").click(modifiers=["Shift"])  # range from anchor
     expect(page.locator("#region-list .lv-region-item.selected")).to_have_count(4)
@@ -201,7 +201,7 @@ def test_multi_selection_delete_selected_and_clear(
 
     # Ctrl+A with the Regions panel focused, then Delete Selected (one undo).
     page.click("#region-list")
-    page.keyboard.press("Control+a")
+    page.keyboard.press("ControlOrMeta+a")
     expect(page.locator("#region-list .lv-region-item.selected")).to_have_count(4)
     expect(page.locator("#region-delete-selected-button")).to_be_enabled()
     page.once("dialog", lambda dialog: dialog.accept())
@@ -209,15 +209,15 @@ def test_multi_selection_delete_selected_and_clear(
     expect(rows).to_have_count(0)
     expect(page.locator("#save-state")).to_have_text("Saved")
     expect(page.locator("#status-validation")).to_contain_text("not run")
-    page.keyboard.press("Control+z")
+    page.keyboard.press("ControlOrMeta+z")
     expect(rows).to_have_count(4)
     expect(page.locator("#save-state")).to_have_text("Saved")
     assert sorted(r["region_id"] for r in _regions(page, live_server_url, pid, dsid)) == sorted(ids)
-    page.keyboard.press("Control+y")
+    page.keyboard.press("ControlOrMeta+y")
     expect(rows).to_have_count(0)
 
     # Clear selection button exists in the toolbar and is harmless.
-    page.keyboard.press("Control+z")
+    page.keyboard.press("ControlOrMeta+z")
     expect(rows).to_have_count(4)
     rows.nth(0).locator(".lv-region-name").click()
     page.click("#clear-selection-button")
@@ -244,7 +244,7 @@ def test_merge_and_split_are_undoable_with_original_ids(
 
     # Merge refuses different classes with an explanation.
     rows.nth(0).locator(".lv-region-name").click()  # ids[2] (class B)
-    rows.nth(1).locator(".lv-region-name").click(modifiers=["Control"])  # ids[1] (class A)
+    rows.nth(1).locator(".lv-region-name").click(modifiers=["ControlOrMeta"])  # ids[1] (class A)
     page.click("#region-merge-button")
     expect(page.locator("#action-message")).to_contain_text("different classes")
     expect(rows).to_have_count(3)
@@ -252,7 +252,7 @@ def test_merge_and_split_are_undoable_with_original_ids(
     # Merge the two class-A regions, undo restores both ids and masks.
     page.keyboard.press("Escape")
     rows.nth(1).locator(".lv-region-name").click()
-    rows.nth(2).locator(".lv-region-name").click(modifiers=["Control"])
+    rows.nth(2).locator(".lv-region-name").click(modifiers=["ControlOrMeta"])
     page.click("#region-merge-button")
     expect(rows).to_have_count(2)
     expect(page.locator("#save-state")).to_have_text("Saved")
@@ -260,21 +260,21 @@ def test_merge_and_split_are_undoable_with_original_ids(
     assert {r["region_id"] for r in merged} == {ids[0], ids[2]} or {
         r["region_id"] for r in merged
     } == {ids[1], ids[2]}
-    page.keyboard.press("Control+z")
+    page.keyboard.press("ControlOrMeta+z")
     expect(rows).to_have_count(3)
     expect(page.locator("#save-state")).to_have_text("Saved")
     restored = _regions(page, live_server_url, pid, dsid)
     assert {(r["region_id"], r["area"], r["class_id"], r["z_order"]) for r in restored} == {
         (r["region_id"], r["area"], r["class_id"], r["z_order"]) for r in before
     }
-    page.keyboard.press("Control+y")
+    page.keyboard.press("ControlOrMeta+y")
     expect(rows).to_have_count(2)
-    page.keyboard.press("Control+z")
+    page.keyboard.press("ControlOrMeta+z")
     expect(rows).to_have_count(3)
 
     # Split the merged-like two-component region: create it via merge first.
     rows.nth(1).locator(".lv-region-name").click()
-    rows.nth(2).locator(".lv-region-name").click(modifiers=["Control"])
+    rows.nth(2).locator(".lv-region-name").click(modifiers=["ControlOrMeta"])
     page.click("#region-merge-button")
     expect(rows).to_have_count(2)
     merged_id = [
@@ -288,7 +288,7 @@ def test_merge_and_split_are_undoable_with_original_ids(
     page.click("#region-split-button")
     expect(rows).to_have_count(3)
     expect(page.locator("#action-message")).to_contain_text("Split into 2")
-    page.keyboard.press("Control+z")
+    page.keyboard.press("ControlOrMeta+z")
     expect(rows).to_have_count(2)
     after_undo = _regions(page, live_server_url, pid, dsid)
     assert {r["region_id"] for r in after_undo} == {merged_id, ids[2]}
@@ -314,7 +314,7 @@ def test_subtract_by_order_resolves_overlap_and_is_undoable(
     expect(page.locator("#region-subtract-button")).to_be_disabled()
     # Select the big region (bottom) and the first island.
     rows.nth(3).locator(".lv-region-name").click()
-    rows.nth(2).locator(".lv-region-name").click(modifiers=["Control"])
+    rows.nth(2).locator(".lv-region-name").click(modifiers=["ControlOrMeta"])
     expect(page.locator("#region-subtract-button")).to_be_enabled()
     dialogs: list[str] = []
     page.once("dialog", lambda dialog: (dialogs.append(dialog.message), dialog.accept()))
@@ -327,7 +327,7 @@ def test_subtract_by_order_resolves_overlap_and_is_undoable(
     assert regions[ids[2]]["area"] == 100 and regions[ids[3]]["area"] == 196  # not selected
     # The remaining overlap group is the untouched island / cover pair.
     expect(page.locator("#status-overlaps")).to_contain_text("Overlaps: 1")
-    page.keyboard.press("Control+z")
+    page.keyboard.press("ControlOrMeta+z")
     expect(page.locator("#save-state")).to_have_text("Saved")
     regions = {r["region_id"]: r for r in _regions(page, live_server_url, pid, dsid)}
     assert regions[ids[0]]["area"] == 64 * 64
@@ -337,7 +337,7 @@ def test_subtract_by_order_resolves_overlap_and_is_undoable(
     page.keyboard.press("Escape")
     rows.nth(0).locator(".lv-region-name").click()  # cover region (top)
     page.locator(f'#region-list .lv-region-item[data-region-id="{ids[2]}"] .lv-region-name').click(
-        modifiers=["Control"]
+        modifiers=["ControlOrMeta"]
     )
     dialogs.clear()
     page.once("dialog", lambda dialog: (dialogs.append(dialog.message), dialog.accept()))
@@ -345,6 +345,6 @@ def test_subtract_by_order_resolves_overlap_and_is_undoable(
     expect(rows).to_have_count(3)
     assert "become empty" in dialogs[0]
     assert ids[2] not in {r["region_id"] for r in _regions(page, live_server_url, pid, dsid)}
-    page.keyboard.press("Control+z")
+    page.keyboard.press("ControlOrMeta+z")
     expect(rows).to_have_count(4)
     assert ids[2] in {r["region_id"] for r in _regions(page, live_server_url, pid, dsid)}

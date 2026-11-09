@@ -85,7 +85,7 @@ def main(argv: list[str] | None = None) -> int:
             rt = batches.add_file(batch, "topography", topo.name, t)
         with fric.open("rb") as f:
             rf = batches.add_file(batch, "friction", fric.name, f)
-        pairs.append((key, rt.file_id, rf.file_id))
+        pairs.append((key, {"topography": rt.file_id, "friction": rf.file_id}))
     created = datasets.commit_batch(
         project.project_id,
         batch,

@@ -584,7 +584,9 @@ every written file and the SHA-256 of every source image.
 ## Keyboard shortcuts
 
 Shortcuts are ignored while typing into a text field; panel-scoped
-shortcuts fire only while that panel has focus. The table is generated
+shortcuts fire only while that panel has focus. On macOS use `Cmd` (⌘)
+wherever this guide says `Ctrl` (`Cmd+Click`, `Cmd+Z`, ...); `Ctrl+Click`
+opens the context menu there. The table is generated
 from `src/afmlabel/static/help/shortcuts.json` by
 `scripts/generate_help_reference.py`.
 

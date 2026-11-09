@@ -36,7 +36,7 @@ Always install into a virtual environment, never into the system Python.
 ## Install on Windows (PowerShell)
 
 ```powershell
-git clone <repository-url> afmlabel
+git clone https://github.com/It4innovations/AFMLabel.git afmlabel
 cd afmlabel
 py -3.13 -m venv .venv
 .\.venv\Scripts\Activate.ps1
@@ -51,7 +51,7 @@ run the activation script, start it once with
 ## Install on Linux
 
 ```bash
-git clone <repository-url> afmlabel
+git clone https://github.com/It4innovations/AFMLabel.git afmlabel
 cd afmlabel
 python3.12 -m venv .venv            # or python3.13
 source .venv/bin/activate
@@ -69,7 +69,7 @@ anything at runtime.
 
 ```bash
 brew install python@3.13              # or use python.org / pyenv
-git clone <repository-url> afmlabel
+git clone https://github.com/It4innovations/AFMLabel.git afmlabel
 cd afmlabel
 python3.13 -m venv .venv
 source .venv/bin/activate
@@ -81,12 +81,17 @@ The application runs CPU-only on macOS (Intel and Apple silicon). The
 optional `sam21` backend works on CPU; `sam3` needs about 7.7 GiB RAM with
 `allow_cpu: true`; `sam31` is CUDA-only and therefore unavailable on macOS.
 
+`scripts/dev/bootstrap.sh python3.13` runs the same steps.
+
 ## Configure
 
 ```bash
 cp config/app.example.yaml config/app.yaml     # PowerShell: Copy-Item
 afmlabel auth set-password --username lab      # creates the single account
 ```
+
+`set-password` prompts twice for the password; without a terminal (scripts,
+batch jobs) it reads `AFMLABEL_PASSWORD` from the environment instead.
 
 Every value in `config/app.yaml` can be overridden with an
 `AFMLABEL_<SECTION>__<KEY>` environment variable. The application also
@@ -107,6 +112,7 @@ Secrets (tokens, passwords) are never read from the YAML file.
 ## Run
 
 ```bash
+afmlabel version                                # prints the installed version
 afmlabel serve --host 127.0.0.1 --port 9080
 ```
 

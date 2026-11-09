@@ -118,7 +118,7 @@ def test_brush_polygon_channel_and_persistence(
     expect(page.locator("#save-state")).to_have_text("Saved")
     area_after = page.evaluate(SELECTED_AREA_JS)
     assert area_after < area_before
-    page.keyboard.press("Control+z")
+    page.keyboard.press("ControlOrMeta+z")
     expect(page.locator("#save-state")).to_have_text("Saved")
     area_restored = page.evaluate(SELECTED_AREA_JS)
     assert area_restored == area_before

@@ -55,12 +55,12 @@ def test_findings_sorting_filters_multiselect_and_bulk_review(
     items.nth(3).click(modifiers=["Shift"])
     expect(page.locator("#findings-list .lv-finding-item.selected")).to_have_count(3)
     expect(page.locator("#findings-selected-count")).to_have_text("3 selected")
-    items.nth(2).click(modifiers=["Control"])  # toggle one off
+    items.nth(2).click(modifiers=["ControlOrMeta"])  # toggle one off
     expect(page.locator("#findings-list .lv-finding-item.selected")).to_have_count(2)
     page.keyboard.press("Escape")
     expect(page.locator("#findings-list .lv-finding-item.selected")).to_have_count(0)
     page.click("#findings-list")
-    page.keyboard.press("Control+a")
+    page.keyboard.press("ControlOrMeta+a")
     expect(page.locator("#findings-list .lv-finding-item.selected")).to_have_count(4)
 
     # Mark Selected Reviewed only touches overlaps; geometry is unchanged.
