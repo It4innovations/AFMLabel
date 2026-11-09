@@ -1,0 +1,13 @@
+{
+  "schema_version": 1,
+  "project_id": "proj_0123456789",
+  "name": "Legacy project",
+  "created_at": "2026-08-01T10:00:00.000+00:00",
+  "modified_at": "2026-08-02T10:00:00.000+00:00",
+  "revision": 7,
+  "status": "active",
+  "config": {"boundary_mode": "explicit_class", "require_overlap_review": true},
+  "dataset_order": ["ds_abcdef0123"],
+  "import_history": [],
+  "export_history": []
+}

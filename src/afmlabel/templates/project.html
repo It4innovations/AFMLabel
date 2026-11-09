@@ -1,0 +1,319 @@
+{# SPDX-License-Identifier: MIT
+   Copyright (c) 2026 IT4Innovations, VSB-Technical University of Ostrava #}
+{% extends "base.html" %}
+{% block title %}{{ project.name }}{% endblock %}
+{% block nav %}<a href="/">Projects</a><a href="/projects/{{ project.project_id }}" class="active">{{ project.name }}</a>{% endblock %}
+{% block header_right %}
+  {% if session %}<span class="lv-user" id="current-user">{{ session.username }}</span>
+  <button type="button" class="lv-btn lv-btn-text" id="logout-button" data-help-trivial>Sign out</button>{% endif %}
+{% endblock %}
+{% block body_attrs %}id="project-body" data-project-id="{{ project.project_id }}" data-project-revision="{{ project.revision }}"{% endblock %}
+
+{% block content %}
+<main class="lv-page">
+  <div class="lv-toolbar">
+    <div class="lv-job-title">
+      <strong id="project-title">{{ project.name }}</strong>
+      <span>#{{ project.project_id[-6:] }} &middot; revision <span id="project-revision">{{ project.revision }}</span> &middot; <span id="project-channel-summary">{{ project.channels|length }} channel{{ "" if project.channels|length == 1 else "s" }}</span> &middot; boundary mode <code>{{ effective_boundary_mode }}</code> &middot; overlap review {{ "required" if effective_require_overlap_review else "optional" }}</span>
+    </div>
+    <div class="lv-toolbar-right">
+      <span class="lv-chip" id="lock-indicator" data-help="project.lock" tabindex="0">lock: unknown</span>
+      <button type="button" class="lv-btn" id="rename-project-button" data-help="project.rename">Rename</button>
+      <button type="button" class="lv-btn" id="import-tswat-button" data-help="project.import_xml">Import XML annotations</button>
+      <button type="button" class="lv-btn" id="open-export-button" data-help="project.export">Export</button>
+      <button type="button" class="lv-btn lv-btn-primary" id="import-pairs-button" data-help="project.import_pairs">Import images</button>
+    </div>
+  </div>
+
+  <section class="lv-section">
+    <h2 class="lv-section-heading">Datasets <span class="lv-count" id="dataset-count">{{ project.dataset_order|length }}</span></h2>
+    <div class="lv-filter-bar" id="dataset-filter-bar">
+      <input type="search" id="dataset-search" class="lv-input" placeholder="Search datasets (filename, pairing key, name, id)…" aria-label="Search datasets" data-help="dataset.search" autocomplete="off" />
+      <button type="button" class="lv-btn lv-btn-small" id="dataset-search-clear" data-help="dataset.search_clear" hidden>Clear filter</button>
+      <span class="lv-filter-count" id="dataset-filter-count" aria-live="polite"></span>
+      <button type="button" class="lv-help-more" data-help-more="dataset.search" aria-label="More help: dataset search">?</button>
+    </div>
+    <div id="dataset-list" class="lv-dataset-grid">
+      <div class="lv-empty" id="dataset-empty" {% if project.dataset_order %}hidden{% endif %}>
+        <h2>No datasets yet</h2>
+        <p>Import one image per channel in batch; datasets are previewed before anything is committed.</p>
+      </div>
+      <p class="lv-no-results" id="dataset-no-results" hidden>No dataset matches the filter.</p>
+    </div>
+  </section>
+
+  <section class="lv-section">
+    <h2 class="lv-section-heading">Channels <span class="lv-count" id="channel-count">{{ project.channels|length }}</span></h2>
+    <p class="lv-hint" id="channels-hint">Every dataset carries exactly one source image per channel; all channels share one annotation. The key names files, API paths and export folders; the filename tokens are removed from uploaded filenames to pair files into a dataset (<code>239_topography.tiff</code> + <code>239_friction.tiff</code> → <code>239</code>). <strong>Channels can be changed only while the project has no datasets.</strong> <button type="button" class="lv-help-more" data-help-more="project.channels" aria-label="More help: channels">?</button></p>
+    <table class="lv-table" id="channel-table" data-help="project.channels">
+      <thead><tr><th>#</th><th>Label</th><th>Key</th><th>Filename tokens (comma separated)</th><th></th></tr></thead>
+      <tbody id="channel-table-body"></tbody>
+    </table>
+    <div class="lv-inline-form" id="channel-actions">
+      <button type="button" class="lv-btn" id="channel-add-button" data-help="project.channel_add">Add channel</button>
+      <button type="button" class="lv-btn lv-btn-primary" id="channel-save-button" data-help="project.channel_save" disabled>Save channels</button>
+      <button type="button" class="lv-btn" id="channel-reset-button" data-help-trivial disabled>Discard changes</button>
+      <span class="lv-hint" id="channel-lock-note" hidden>Locked: the project already has datasets.</span>
+    </div>
+    <p id="channel-error" class="lv-form-error" role="alert"></p>
+  </section>
+
+  <section class="lv-section">
+    <h2 class="lv-section-heading">Classes <span class="lv-count" id="class-count">{{ classes.classes|length }}</span></h2>
+    <p class="lv-hint">Classes are project-wide: every dataset shares these stable identifiers. Colours are display-only; identity is the numeric id / stable key. A class keyed <code>buffer</code> is proposed by the flattened-mask import.</p>
+    <table class="lv-table" id="class-table">
+      <thead>
+        <tr><th>ID</th><th>Colour</th><th>Name</th><th>Stable key <button type="button" class="lv-help-more" data-help-more="class.stable_key" aria-label="More help: stable key">?</button></th><th>Role <button type="button" class="lv-help-more" data-help-more="class.role" aria-label="More help: semantic role">?</button></th><th>Export id <button type="button" class="lv-help-more" data-help-more="class.export_id" aria-label="More help: export id">?</button></th><th>Enabled</th><th></th></tr>
+      </thead>
+      <tbody id="class-table-body"></tbody>
+    </table>
+    <form id="class-create-form" class="lv-inline-form">
+      <input type="text" id="new-class-name" class="lv-input" placeholder="New class name" aria-label="New class name" maxlength="100" required data-help="class.name" />
+      <input type="color" id="new-class-color" class="lv-color-input" value="#00a398" aria-label="Colour" data-help="class.color" />
+      <select id="new-class-role" class="lv-select" aria-label="Semantic role" data-help="class.role">
+        <option value="MaterialLayer">MaterialLayer</option>
+        <option value="Boundary">Boundary</option>
+        <option value="Unspecified">Unspecified</option>
+      </select>
+      <button type="submit" class="lv-btn lv-btn-primary" data-help="class.add">Add class</button>
+    </form>
+    <p id="class-error" class="lv-form-error" role="alert"></p>
+  </section>
+
+  <section class="lv-section">
+    <details class="lv-details">
+      <summary data-help-trivial>Audit log</summary>
+      <ul id="event-list" class="lv-event-list"></ul>
+      <button type="button" class="lv-link-button" id="refresh-events-button" data-help-trivial>Refresh</button>
+    </details>
+  </section>
+</main>
+
+<div class="lv-modal-backdrop" id="rename-project-modal" hidden>
+  <div class="lv-modal" role="dialog" aria-modal="true" aria-labelledby="rename-project-heading">
+    <div class="lv-modal-header">
+      <h2 id="rename-project-heading">Rename project</h2>
+      <button type="button" class="lv-modal-close" id="close-rename-modal-button" aria-label="Close" data-help-trivial>&times;</button>
+    </div>
+    <form id="rename-project-form">
+      <div class="lv-modal-body">
+        <div class="lv-field">
+          <label class="lv-label" for="rename-project-name">Project name</label>
+          <input type="text" id="rename-project-name" class="lv-input lv-full-width" required maxlength="200" value="{{ project.name }}" data-help-trivial />
+        </div>
+        <p id="rename-project-error" class="lv-form-error" role="alert"></p>
+      </div>
+      <div class="lv-modal-footer">
+        <button type="button" class="lv-btn" id="cancel-rename-modal-button" data-help-trivial>Cancel</button>
+        <button type="submit" class="lv-btn lv-btn-primary" data-help-trivial>Save</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+{% block project_dialogs %}
+<div class="lv-modal-backdrop" id="import-pairs-modal" hidden>
+  <div class="lv-modal lv-modal-xwide" role="dialog" aria-modal="true" aria-labelledby="import-pairs-heading">
+    <div class="lv-modal-header">
+      <h2 id="import-pairs-heading">Import images</h2>
+      <button type="button" class="lv-modal-close" id="close-import-modal-button" aria-label="Close" data-help-trivial>&times;</button>
+    </div>
+    <div class="lv-modal-body">
+      <div class="lv-field-row lv-channel-file-inputs" id="import-channel-inputs"></div>
+      <div class="lv-field lv-file">
+        <label class="lv-label" for="import-auto-files">All channels at once (sorted by filename token)</label>
+        <input type="file" id="import-auto-files" multiple accept=".tif,.tiff,.png,.jpg,.jpeg" data-help="import.auto_files" />
+        <p class="lv-hint" id="import-auto-note"></p>
+      </div>
+      <p class="lv-hint">Files are grouped into one dataset by the identifier left after removing the channel tokens from the filename (e.g. <code>239_topography.tiff</code> + <code>239_friction.tiff</code> → <code>239</code>). Nothing is committed until you confirm the preview.</p>
+      <div class="lv-inline-form">
+        <button type="button" class="lv-btn lv-btn-primary" id="import-upload-button" data-help="import.upload_preview">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 16V4M6 10l6-6 6 6" /><path d="M4 20h16" /></svg>
+          Upload and preview pairing
+        </button>
+        <div id="import-progress-container" hidden>
+          <progress id="import-progress" value="0" max="100"></progress>
+          <span id="import-progress-label">0%</span>
+        </div>
+      </div>
+      <p id="pairing-summary" class="lv-hint"></p>
+      <div style="overflow-x: auto">
+        <table class="lv-table lv-pairing-table">
+          <thead id="pairing-preview-head"><tr><th>Dataset</th><th>Status</th></tr></thead>
+          <tbody id="pairing-preview-body"></tbody>
+        </table>
+      </div>
+      <p id="import-order-row" class="lv-warning" hidden>
+        <label><input type="checkbox" id="import-allow-order" data-help="import.allow_order" /> No identifiers could be extracted from these filenames. Pair files by sorted filename order instead (I confirm the order is correct).</label>
+      </p>
+      <p id="import-error" class="lv-form-error" role="alert"></p>
+    </div>
+    <div class="lv-modal-footer">
+      <button type="button" class="lv-btn" id="cancel-import-modal-button" data-help-trivial>Cancel</button>
+      <button type="button" class="lv-btn lv-btn-primary" id="import-commit-button" data-help="import.commit" disabled>Create datasets</button>
+    </div>
+  </div>
+</div>
+
+<div class="lv-modal-backdrop" id="replace-source-modal" hidden>
+  <div class="lv-modal lv-modal-wide" role="dialog" aria-modal="true" aria-labelledby="replace-source-heading">
+    <div class="lv-modal-header">
+      <h2 id="replace-source-heading">Replace source image — <span id="replace-source-dataset"></span></h2>
+      <button type="button" class="lv-modal-close" id="close-replace-modal-button" aria-label="Close" data-help-trivial>&times;</button>
+    </div>
+    <div class="lv-modal-body">
+      <div class="lv-field-row">
+        <div class="lv-field">
+          <label class="lv-label" for="replace-source-channel">Channel</label>
+          <select id="replace-source-channel" class="lv-select lv-full-width" data-help="replace.channel"></select>
+        </div>
+        <div class="lv-field lv-file">
+          <label class="lv-label" for="replace-source-file">Replacement file</label>
+          <input type="file" id="replace-source-file" accept=".tif,.tiff,.png,.jpg,.jpeg" data-help-trivial />
+        </div>
+      </div>
+      <button type="button" class="lv-btn lv-btn-primary" id="replace-source-check-button" data-help="replace.check">Upload and check compatibility</button>
+      <pre id="replace-source-report" class="lv-code" style="margin-top: 12px; white-space: pre-wrap"></pre>
+      <p id="replace-source-error" class="lv-form-error" role="alert"></p>
+    </div>
+    <div class="lv-modal-footer">
+      <button type="button" class="lv-btn" id="cancel-replace-modal-button" data-help-trivial>Cancel</button>
+      <button type="button" class="lv-btn lv-btn-primary" id="replace-source-confirm-button" data-help="replace.confirm" disabled>Confirm replacement</button>
+    </div>
+  </div>
+</div>
+<div class="lv-modal-backdrop" id="tswat-import-modal" hidden>
+  <div class="lv-modal lv-modal-xwide" role="dialog" aria-modal="true" aria-labelledby="tswat-import-heading">
+    <div class="lv-modal-header">
+      <h2 id="tswat-import-heading">Import TSWAT / CVAT XML annotations</h2>
+      <button type="button" class="lv-modal-close" id="close-tswat-modal-button" aria-label="Close" data-help-trivial>&times;</button>
+    </div>
+    <div class="lv-modal-body">
+      <div class="lv-field-row">
+        <div class="lv-field lv-file">
+          <label class="lv-label" for="tswat-file">CVAT for images 1.1 XML</label>
+          <input type="file" id="tswat-file" accept=".xml" data-help="xml.file" />
+        </div>
+        <div class="lv-field">
+          <label class="lv-label" for="tswat-target-dataset">Target dataset (only for a single unmatched image)</label>
+          <select id="tswat-target-dataset" class="lv-select lv-full-width" data-help="xml.target_dataset"></select>
+        </div>
+      </div>
+      <p class="lv-hint">Every mask and polygon becomes its own region; overlaps are preserved and start as <em>unreviewed</em>. XML images are matched to datasets by the source filename of any channel; dimension mismatches are refused, never resampled.</p>
+      <button type="button" class="lv-btn lv-btn-primary" id="tswat-stage-button" data-help="xml.stage">Upload and preview</button>
+      <p id="tswat-summary" class="lv-hint"></p>
+      <div style="overflow-x: auto">
+        <table class="lv-table lv-pairing-table">
+          <thead><tr><th>XML image</th><th>Size</th><th>Shapes</th><th>Dataset</th><th>Status</th></tr></thead>
+          <tbody id="tswat-images-body"></tbody>
+        </table>
+        <table class="lv-table">
+          <thead><tr><th>XML label</th><th>Shapes</th><th>Class <button type="button" class="lv-help-more" data-help-more="xml.class_mapping" aria-label="More help: class mapping">?</button></th></tr></thead>
+          <tbody id="tswat-labels-body"></tbody>
+        </table>
+      </div>
+      <pre id="tswat-result" class="lv-code" style="white-space: pre-wrap"></pre>
+      <p id="tswat-error" class="lv-form-error" role="alert"></p>
+    </div>
+    <div class="lv-modal-footer">
+      <button type="button" class="lv-btn" id="cancel-tswat-modal-button" data-help-trivial>Close</button>
+      <button type="button" class="lv-btn lv-btn-primary" id="tswat-commit-button" data-help="xml.commit" disabled>Import regions</button>
+    </div>
+  </div>
+</div>
+
+<div class="lv-modal-backdrop" id="lossy-import-modal" hidden>
+  <div class="lv-modal lv-modal-wide" role="dialog" aria-modal="true" aria-labelledby="lossy-import-heading">
+    <div class="lv-modal-header">
+      <h2 id="lossy-import-heading">Import flattened mask (lossy) — <span id="lossy-dataset-name"></span></h2>
+      <button type="button" class="lv-modal-close" id="close-lossy-modal-button" aria-label="Close" data-help-trivial>&times;</button>
+    </div>
+    <div class="lv-modal-body">
+      <p class="lv-warning" data-help="lossy.warning" tabindex="0">A flattened label raster has already lost overlaps and hidden regions. They cannot be reconstructed; imported regions are marked <code>lossy_import</code> and validation keeps warning about them. Prefer the XML import whenever the source annotation exists. <button type="button" class="lv-help-more" data-help-more="lossy.warning" aria-label="More help: lossy import">?</button></p>
+      <div class="lv-field lv-file">
+        <label class="lv-label" for="lossy-file">Single-channel label raster (PNG/TIFF, 0 = unlabelled, must be <span id="lossy-expected-size"></span>)</label>
+        <input type="file" id="lossy-file" accept=".png,.tif,.tiff" data-help="lossy.file" />
+      </div>
+      <button type="button" class="lv-btn lv-btn-primary" id="lossy-stage-button" data-help="lossy.stage">Upload and preview values</button>
+      <p class="lv-hint" id="lossy-default-note"></p>
+      <table class="lv-table" style="margin-top: 12px">
+        <thead><tr><th>Raster value</th><th>Pixels</th><th>Target class <button type="button" class="lv-help-more" data-help-more="lossy.target_class" aria-label="More help: target class">?</button></th></tr></thead>
+        <tbody id="lossy-values-body"></tbody>
+      </table>
+      <label class="lv-hint"><input type="checkbox" id="lossy-split" data-help="lossy.split" checked /> one region per connected component</label>
+      <p class="lv-warning" id="lossy-discard-row" hidden><label><input type="checkbox" id="lossy-confirm-discard" data-help="lossy.confirm_discard" /> I confirm the values marked “do not import” are discarded (their pixels stay unlabelled).</label></p>
+      <p id="lossy-error" class="lv-form-error" role="alert"></p>
+    </div>
+    <div class="lv-modal-footer">
+      <button type="button" class="lv-btn" id="cancel-lossy-modal-button" data-help-trivial>Cancel</button>
+      <button type="button" class="lv-btn lv-btn-primary" id="lossy-commit-button" data-help="lossy.commit" disabled>Import as lossy regions</button>
+    </div>
+  </div>
+</div>
+<div class="lv-modal-backdrop" id="export-modal" hidden>
+  <div class="lv-modal lv-modal-xwide" role="dialog" aria-modal="true" aria-labelledby="export-heading">
+    <div class="lv-modal-header">
+      <h2 id="export-heading">Export datasets</h2>
+      <button type="button" class="lv-modal-close" id="close-export-modal-button" aria-label="Close" data-help-trivial>&times;</button>
+    </div>
+    <div class="lv-modal-body">
+      <div class="lv-field-row">
+        <div class="lv-field">
+          <label class="lv-label" for="export-profile">Profile <button type="button" class="lv-help-more" data-help-more="export.profile" aria-label="More help: export profile">?</button></label>
+          <select id="export-profile" class="lv-select lv-full-width" data-help="export.profile"></select>
+        </div>
+        <div class="lv-field">
+          <label class="lv-label" for="export-mask-semantics">Mask values <button type="button" class="lv-help-more" data-help-more="export.mask_semantics" aria-label="More help: mask values">?</button></label>
+          <select id="export-mask-semantics" class="lv-select lv-full-width" data-help="export.mask_semantics">
+            <option value="class">class export id per pixel (machine-readable)</option>
+            <option value="instance">unique id per region (instance)</option>
+          </select>
+        </div>
+      </div>
+      <div class="lv-field-row">
+        <div class="lv-field">
+          <label class="lv-label" for="export-boundary-policy">Boundary-class pixels</label>
+          <select id="export-boundary-policy" class="lv-select lv-full-width" data-help="export.boundary_policy">
+            <option value="class">export as their class / instance value</option>
+            <option value="zero">export as 0 (ignored by the downstream evaluation)</option>
+          </select>
+        </div>
+        <div class="lv-field">
+          <label class="lv-label" for="export-raster-format">Mask file format</label>
+          <select id="export-raster-format" class="lv-select lv-full-width" data-help="export.raster_format">
+            <option value="tiff">TIFF (.tif, uint16, uncompressed — loader default)</option>
+            <option value="png">PNG (.png, uint16)</option>
+          </select>
+        </div>
+      </div>
+      <div class="lv-field">
+        <label class="lv-hint"><input type="checkbox" id="export-color-visualization" data-help="export.color_visualization" checked /> also write a colour visualisation (<code>mask_color.png</code>, exact GUI class colours) next to the machine-readable mask</label>
+        <p class="lv-hint">Only datasets validated at their current revision are exported; every exported mask has exactly one value per pixel. See <a href="/help/user-guide#export" target="_blank" rel="noopener">Export in the user guide</a>.</p>
+      </div>
+      <div class="lv-field">
+        <span class="lv-label">Datasets</span>
+        <div class="lv-filter-bar">
+          <input type="search" id="export-search" class="lv-input" placeholder="Search datasets (name, filename, pairing key, status)…" aria-label="Search export datasets" data-help="export.search" autocomplete="off" />
+          <button type="button" class="lv-btn lv-btn-small" id="export-select-all" data-help="export.select_all">Select all validated</button>
+          <span class="lv-filter-count" id="export-filter-count" aria-live="polite"></span>
+        </div>
+        <ul id="export-dataset-list" class="lv-export-history lv-export-list" data-help="export.dataset_row"></ul>
+        <pre id="export-filename-preview" class="lv-export-preview" data-help="export.filename_preview" tabindex="0" hidden></pre>
+      </div>
+      <button type="button" class="lv-btn lv-btn-primary" id="export-run-button" data-help="export.run">Create export</button>
+      <p id="export-status"></p>
+      <p id="export-error" class="lv-form-error" role="alert"></p>
+      <h3 class="lv-panel-heading" style="margin-top: 18px">Previous exports</h3>
+      <ul id="export-history" class="lv-export-history"></ul>
+    </div>
+    <div class="lv-modal-footer">
+      <button type="button" class="lv-btn" id="cancel-export-modal-button" data-help-trivial>Close</button>
+    </div>
+  </div>
+</div>
+{% endblock %}
+{% endblock %}
+
+{% block scripts %}
+<script type="module" src="{{ asset_url('js/project.js') }}"></script>
+{% endblock %}

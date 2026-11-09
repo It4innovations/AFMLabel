@@ -1,0 +1,17 @@
+{# SPDX-License-Identifier: MIT
+   Copyright (c) 2026 IT4Innovations, VSB-Technical University of Ostrava #}
+{# Applies the stored theme before first paint. Must stay inline and
+   synchronous: loading it as a module would run after the first paint and
+   the wrong theme would flash. Dark is the default (LabVIST convention). #}
+<script>
+  (function () {
+    try {
+      var stored = window.localStorage.getItem("afmlabel-theme");
+      if (stored === "light" || stored === "dark") {
+        document.documentElement.dataset.theme = stored;
+      }
+    } catch (error) {
+      /* storage unavailable -- fall through to the dark default */
+    }
+  })();
+</script>

@@ -1,0 +1,1674 @@
+/* SPDX-License-Identifier: MIT
+   Copyright (c) 2026 IT4Innovations, VSB-Technical University of Ostrava */
+/* AFMLabel shared chrome + project list (follows the LabVIST visual conventions; server-rendered, no
+   build step). Dark theme matching the IT4I Blender portal: near-black
+   shell, faintly lifted surfaces, teal (#00a398) accent. */
+
+:root {
+  --lv-primary: #00a398;
+  --lv-primary-hover: #00c9ba;
+  --lv-primary-active: #00857c;
+  --lv-primary-fade: rgba(0, 163, 152, 0.15);
+  /* Teal is light enough that near-black beats white for contrast on it. */
+  --lv-on-primary: #04211f;
+  --lv-info: #4a9eff;
+
+  --lv-text: #ffffff;
+  --lv-text-secondary: #888888;
+  --lv-text-disabled: #555555;
+
+  --lv-border: rgba(0, 163, 152, 0.22);
+  --lv-border-light: rgba(255, 255, 255, 0.08);
+  --lv-bg-body: #0a0a0a;
+  --lv-bg-elevated: #141414;
+  --lv-bg-inset: #0f0f0f;
+  --lv-bg-hover: #1e1e1e;
+  --lv-header-bg: #141414;
+  --lv-canvas-bg: #000000;
+
+  --lv-success: #52c41a;
+  --lv-success-bg: rgba(82, 196, 26, 0.12);
+  --lv-success-border: rgba(82, 196, 26, 0.35);
+  --lv-warning: #faad14;
+  --lv-warning-bg: rgba(250, 173, 20, 0.12);
+  --lv-warning-border: rgba(250, 173, 20, 0.35);
+  --lv-danger: #ff4d4f;
+  --lv-danger-bg: rgba(255, 77, 79, 0.12);
+  --lv-danger-border: rgba(255, 77, 79, 0.35);
+
+  --lv-radius: 2px;
+  --lv-shadow: 0 1px 2px rgba(0, 0, 0, 0.5), 0 1px 6px rgba(0, 0, 0, 0.35);
+  --lv-shadow-modal: 0 8px 28px rgba(0, 0, 0, 0.7);
+
+  --lv-header-height: 48px;
+  --lv-font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue",
+    Arial, sans-serif;
+  --lv-font-mono: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+
+  color-scheme: dark;
+}
+
+/* Light variant of the same system: the teal accent is kept but darkened,
+   because #00a398 on white only reaches ~2.6:1 against body text. Set by
+   the header toggle (static/js/theme.js), which writes data-theme on
+   <html> before first paint so there is no flash of the wrong theme. */
+:root[data-theme="light"] {
+  --lv-primary: #00857c;
+  --lv-primary-hover: #00a398;
+  --lv-primary-active: #006b64;
+  --lv-primary-fade: rgba(0, 163, 152, 0.12);
+  --lv-on-primary: #ffffff;
+  --lv-info: #1668dc;
+
+  --lv-text: #1a1a1a;
+  --lv-text-secondary: #666666;
+  --lv-text-disabled: #aaaaaa;
+
+  --lv-border: rgba(0, 133, 124, 0.3);
+  --lv-border-light: rgba(0, 0, 0, 0.09);
+  --lv-bg-body: #f4f6f6;
+  --lv-bg-elevated: #ffffff;
+  --lv-bg-inset: #fbfcfc;
+  --lv-bg-hover: #eceff0;
+  --lv-header-bg: #ffffff;
+  /* Mid grey, not white: the frame and its mask overlays have to read
+     against the backdrop, and white would wash pale masks out. */
+  --lv-canvas-bg: #6b6b6b;
+
+  --lv-success-bg: rgba(82, 196, 26, 0.12);
+  --lv-success-border: rgba(82, 196, 26, 0.45);
+  --lv-warning-bg: rgba(250, 173, 20, 0.14);
+  --lv-warning-border: rgba(250, 173, 20, 0.5);
+  --lv-danger-bg: rgba(255, 77, 79, 0.1);
+  --lv-danger-border: rgba(255, 77, 79, 0.45);
+
+  --lv-shadow: 0 1px 2px rgba(0, 0, 0, 0.08), 0 1px 6px rgba(0, 0, 0, 0.06);
+  --lv-shadow-modal: 0 6px 16px rgba(0, 0, 0, 0.16);
+
+  color-scheme: light;
+}
+
+/* Surfaces that lift off the page with a translucent white in dark mode
+   need the opposite treatment on light. */
+:root[data-theme="light"] .lv-nav a:hover,
+:root[data-theme="light"] .lv-btn-text:hover:not(:disabled),
+:root[data-theme="light"] .lv-job-back:hover,
+:root[data-theme="light"] .lv-icon-button:hover:not(:disabled),
+:root[data-theme="light"] #frame-nav button:hover:not(:disabled),
+:root[data-theme="light"] .lv-modal-close:hover {
+  background: rgba(0, 0, 0, 0.05);
+}
+
+:root[data-theme="light"] .object-swatch {
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.2);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: var(--lv-font);
+  font-size: 14px;
+  line-height: 1.5715;
+  color: var(--lv-text);
+  background: var(--lv-bg-body);
+  -webkit-font-smoothing: antialiased;
+}
+
+a {
+  color: var(--lv-primary);
+  text-decoration: none;
+}
+
+a:hover {
+  color: var(--lv-primary-hover);
+}
+
+/* ---------------------------------------------------------------- header */
+
+.lv-header {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  height: var(--lv-header-height);
+  padding: 0 16px;
+  background: var(--lv-header-bg);
+  border-bottom: 1px solid var(--lv-border);
+}
+
+.lv-brand {
+  display: flex;
+  align-items: center;
+  height: 100%;
+  padding-right: 16px;
+  margin-right: 16px;
+  border-right: 1px solid var(--lv-border);
+}
+
+/* The asset is a wide transparent PNG (1447x200); height-constrain it and
+   let the width follow so it stays crisp on high-DPI displays. */
+.lv-brand-logo {
+  height: 26px;
+  width: auto;
+  display: block;
+}
+
+.lv-logo {
+  display: flex;
+  align-items: center;
+  margin: 0 20px 0 0;
+  font-size: 18px;
+  font-weight: 300;
+  letter-spacing: 0.32em;
+  color: var(--lv-text);
+  text-transform: uppercase;
+}
+
+.lv-nav {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.lv-nav a {
+  padding: 6px 14px;
+  color: var(--lv-text);
+  border-radius: var(--lv-radius);
+  font-size: 14px;
+}
+
+.lv-nav a:hover {
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--lv-text);
+}
+
+.lv-nav a.active {
+  font-weight: 600;
+}
+
+.lv-header-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-left: auto;
+  color: var(--lv-text-secondary);
+  font-size: 13px;
+}
+
+/* --------------------------------------------------------------- buttons */
+
+.lv-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  height: 32px;
+  padding: 0 15px;
+  font-family: inherit;
+  font-size: 14px;
+  color: var(--lv-text);
+  background: var(--lv-bg-elevated);
+  border: 1px solid var(--lv-border);
+  border-radius: var(--lv-radius);
+  cursor: pointer;
+  transition: color 0.15s, border-color 0.15s, background 0.15s;
+  white-space: nowrap;
+}
+
+.lv-btn:hover:not(:disabled) {
+  color: var(--lv-primary-hover);
+  border-color: var(--lv-primary-hover);
+}
+
+.lv-btn:active:not(:disabled) {
+  color: var(--lv-primary-active);
+  border-color: var(--lv-primary-active);
+}
+
+.lv-btn:disabled {
+  color: var(--lv-text-disabled);
+  background: var(--lv-bg-hover);
+  border-color: var(--lv-border);
+  cursor: not-allowed;
+}
+
+.lv-btn-primary {
+  color: var(--lv-on-primary);
+  background: var(--lv-primary);
+  border-color: var(--lv-primary);
+}
+
+.lv-btn-primary:hover:not(:disabled) {
+  color: var(--lv-on-primary);
+  background: var(--lv-primary-hover);
+  border-color: var(--lv-primary-hover);
+}
+
+.lv-btn-primary:disabled {
+  color: var(--lv-text-disabled);
+  background: var(--lv-bg-hover);
+  border-color: var(--lv-border);
+}
+
+.lv-btn-text {
+  background: transparent;
+  border-color: transparent;
+}
+
+.lv-btn-text:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.lv-btn-icon {
+  width: 32px;
+  padding: 0;
+}
+
+.lv-theme-toggle svg {
+  width: 17px;
+  height: 17px;
+}
+
+/* ---------------------------------------------------------------- inputs */
+
+.lv-input,
+.lv-select,
+.lv-textarea {
+  height: 32px;
+  padding: 4px 11px;
+  font-family: inherit;
+  font-size: 14px;
+  color: var(--lv-text);
+  background: var(--lv-bg-inset);
+  border: 1px solid var(--lv-border);
+  border-radius: var(--lv-radius);
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+.lv-textarea {
+  height: auto;
+  min-height: 64px;
+  padding: 6px 11px;
+  resize: vertical;
+}
+
+.lv-input:focus,
+.lv-select:focus,
+.lv-textarea:focus {
+  outline: none;
+  border-color: var(--lv-primary-hover);
+  box-shadow: 0 0 0 2px rgba(0, 163, 152, 0.28);
+}
+
+.lv-label {
+  display: block;
+  margin-bottom: 6px;
+  font-size: 14px;
+  color: var(--lv-text);
+}
+
+.lv-field {
+  margin-bottom: 18px;
+}
+
+/* --------------------------------------------------- project list toolbar */
+
+.lv-page {
+  max-width: 1240px;
+  margin: 0 auto;
+  padding: 24px 16px 64px;
+}
+
+.lv-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.lv-search {
+  display: flex;
+  flex: 0 1 360px;
+}
+
+.lv-search .lv-input {
+  flex: 1;
+  border-right: none;
+  border-radius: var(--lv-radius) 0 0 var(--lv-radius);
+}
+
+.lv-search-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 42px;
+  height: 32px;
+  color: var(--lv-on-primary);
+  background: var(--lv-primary);
+  border: 1px solid var(--lv-primary);
+  border-radius: 0 var(--lv-radius) var(--lv-radius) 0;
+  cursor: pointer;
+}
+
+.lv-search-button:hover {
+  background: var(--lv-primary-hover);
+  border-color: var(--lv-primary-hover);
+}
+
+.lv-toolbar-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-left: auto;
+}
+
+.lv-count {
+  color: var(--lv-text-secondary);
+  font-size: 13px;
+}
+
+/* ---------------------------------------------------------- project cards */
+
+#project-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.lv-card {
+  display: flex;
+  align-items: stretch;
+  gap: 20px;
+  padding: 16px;
+  background: var(--lv-bg-elevated);
+  border: 1px solid transparent;
+  border-radius: var(--lv-radius);
+  box-shadow: var(--lv-shadow);
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+.lv-card[hidden] {
+  display: none;
+}
+
+.lv-card:hover {
+  border-color: var(--lv-primary);
+  box-shadow: 0 2px 10px rgba(0, 163, 152, 0.25);
+}
+
+.lv-card-thumb {
+  flex: 0 0 176px;
+  width: 176px;
+  height: 100px;
+  object-fit: cover;
+  background: var(--lv-bg-inset)
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='40' viewBox='0 0 24 24' fill='none' stroke='%23555555' stroke-width='1.5'%3E%3Crect x='2' y='4' width='20' height='16' rx='2'/%3E%3Cpath d='m10 9 5 3-5 3z'/%3E%3C/svg%3E")
+    center / 40px no-repeat;
+  border-radius: var(--lv-radius);
+}
+
+.lv-card-main {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-width: 0;
+  flex: 1;
+}
+
+.lv-card-title {
+  margin: 0 0 4px;
+  font-size: 16px;
+  font-weight: 500;
+  color: var(--lv-primary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.lv-card-id {
+  color: var(--lv-text-secondary);
+  font-weight: 400;
+}
+
+.lv-card-meta {
+  margin: 0;
+  font-size: 13px;
+  color: var(--lv-text-secondary);
+}
+
+.lv-card-stats {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  flex: 0 0 240px;
+  gap: 8px;
+}
+
+.lv-card-stats-line {
+  font-size: 12px;
+  color: var(--lv-text-secondary);
+}
+
+.lv-dot {
+  margin: 0 6px;
+}
+
+.lv-progress {
+  position: relative;
+  height: 6px;
+  background: var(--lv-border-light);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.lv-progress-bar {
+  position: absolute;
+  inset: 0 auto 0 0;
+  background: var(--lv-success);
+  border-radius: 3px;
+}
+
+.lv-progress-bar.reviewed {
+  background: var(--lv-primary);
+}
+
+.lv-card-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 10px;
+  flex: 0 0 auto;
+}
+
+.lv-open-button {
+  min-width: 92px;
+  color: var(--lv-primary);
+  border-color: var(--lv-primary);
+}
+
+.lv-status {
+  display: inline-block;
+  padding: 0 8px;
+  font-size: 12px;
+  line-height: 20px;
+  border-radius: var(--lv-radius);
+  border: 1px solid;
+}
+
+.lv-status-in_progress {
+  color: var(--lv-primary);
+  background: var(--lv-primary-fade);
+  border-color: var(--lv-primary);
+}
+
+.lv-status-pending {
+  color: var(--lv-warning);
+  background: var(--lv-warning-bg);
+  border-color: var(--lv-warning-border);
+}
+
+.lv-status-completed {
+  color: var(--lv-success);
+  background: var(--lv-success-bg);
+  border-color: var(--lv-success-border);
+}
+
+.lv-status-failed {
+  color: var(--lv-danger);
+  background: var(--lv-danger-bg);
+  border-color: var(--lv-danger-border);
+}
+
+/* status picker -- same colour language as the read-only badge above */
+.lv-status-select {
+  height: 26px;
+  padding: 0 6px;
+  font-family: inherit;
+  font-size: 12px;
+  border: 1px solid var(--lv-border);
+  border-radius: var(--lv-radius);
+  cursor: pointer;
+}
+
+.lv-status-select:disabled {
+  opacity: 0.6;
+  cursor: progress;
+}
+
+.lv-status-select.lv-status-new {
+  color: var(--lv-text-secondary);
+  background: var(--lv-bg-hover);
+  border-color: var(--lv-border);
+}
+
+.lv-status-select.lv-status-in_progress {
+  color: var(--lv-primary);
+  background: var(--lv-primary-fade);
+  border-color: var(--lv-primary);
+}
+
+.lv-status-select.lv-status-done {
+  color: var(--lv-success);
+  background: var(--lv-success-bg);
+  border-color: var(--lv-success-border);
+}
+
+.lv-status-select.lv-status-archived {
+  color: var(--lv-text-disabled);
+  background: var(--lv-bg-hover);
+  border-color: var(--lv-border);
+}
+
+.lv-card-buttons {
+  display: flex;
+  gap: 8px;
+}
+
+.lv-empty {
+  padding: 64px 16px;
+  text-align: center;
+  color: var(--lv-text-secondary);
+  background: var(--lv-bg-elevated);
+  border-radius: var(--lv-radius);
+  box-shadow: var(--lv-shadow);
+}
+
+.lv-empty h2 {
+  margin: 0 0 8px;
+  font-size: 16px;
+  font-weight: 500;
+  color: var(--lv-text);
+}
+
+/* ----------------------------------------------------------------- modal */
+
+.lv-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 80px 16px 16px;
+  background: rgba(0, 0, 0, 0.75);
+  overflow-y: auto;
+}
+
+.lv-modal-backdrop[hidden] {
+  display: none;
+}
+
+.lv-modal {
+  width: 100%;
+  max-width: 480px;
+  background: var(--lv-bg-elevated);
+  border-radius: var(--lv-radius);
+  box-shadow: var(--lv-shadow-modal);
+}
+
+.lv-modal-header {
+  display: flex;
+  align-items: center;
+  padding: 16px 24px;
+  border-bottom: 1px solid var(--lv-border-light);
+}
+
+.lv-modal-header h2 {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 500;
+}
+
+.lv-modal-close {
+  margin-left: auto;
+  width: 28px;
+  height: 28px;
+  font-size: 18px;
+  line-height: 1;
+  color: var(--lv-text-secondary);
+  background: none;
+  border: none;
+  border-radius: var(--lv-radius);
+  cursor: pointer;
+}
+
+.lv-modal-close:hover {
+  color: var(--lv-text);
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.lv-modal-body {
+  padding: 24px;
+}
+
+.lv-modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  padding: 10px 16px;
+  border-top: 1px solid var(--lv-border-light);
+}
+
+/* file input styled as a dropzone */
+.lv-file input[type="file"] {
+  display: block;
+  width: 100%;
+  padding: 16px;
+  font-family: inherit;
+  font-size: 13px;
+  color: var(--lv-text-secondary);
+  background: var(--lv-bg-hover);
+  border: 1px dashed var(--lv-border);
+  border-radius: var(--lv-radius);
+  cursor: pointer;
+}
+
+.lv-file input[type="file"]:hover {
+  border-color: var(--lv-primary);
+}
+
+#upload-progress-container {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 16px;
+}
+
+#upload-progress-container[hidden] {
+  display: none;
+}
+
+#upload-progress {
+  flex: 1;
+  height: 6px;
+  appearance: none;
+  border: none;
+  border-radius: 3px;
+  background: var(--lv-border-light);
+  overflow: hidden;
+}
+
+#upload-progress::-webkit-progress-bar {
+  background: var(--lv-border-light);
+}
+
+#upload-progress::-webkit-progress-value {
+  background: var(--lv-primary);
+}
+
+#upload-progress::-moz-progress-bar {
+  background: var(--lv-primary);
+}
+
+#upload-progress-label {
+  min-width: 40px;
+  font-size: 13px;
+  color: var(--lv-text-secondary);
+  font-variant-numeric: tabular-nums;
+}
+
+#upload-error {
+  margin: 12px 0 0;
+  color: var(--lv-danger);
+  font-size: 13px;
+}
+
+#upload-error:empty {
+  display: none;
+}
+
+/* ------------------------------------------------------- export dialog */
+
+.lv-modal-wide {
+  max-width: 620px;
+}
+
+.lv-modal-subject {
+  margin: 0 0 20px;
+  font-size: 13px;
+  color: var(--lv-text-secondary);
+}
+
+.lv-field-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.lv-hint {
+  margin: 6px 0 0;
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--lv-text-secondary);
+}
+
+.lv-warning {
+  padding: 12px;
+  background: var(--lv-warning-bg);
+  border: 1px solid var(--lv-warning-border);
+  border-radius: var(--lv-radius);
+}
+
+.lv-field[hidden] {
+  display: none;
+}
+
+#export-status {
+  margin: 16px 0 0;
+  font-size: 13px;
+  color: var(--lv-text-secondary);
+}
+
+#export-status:empty {
+  display: none;
+}
+
+#export-status.error {
+  color: var(--lv-danger);
+}
+
+#export-progress-container {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 12px;
+}
+
+#export-progress-container[hidden] {
+  display: none;
+}
+
+#export-progress {
+  flex: 1;
+  height: 6px;
+  appearance: none;
+  border: none;
+  border-radius: 3px;
+  background: var(--lv-border-light);
+  overflow: hidden;
+}
+
+#export-progress::-webkit-progress-bar {
+  background: var(--lv-border-light);
+}
+
+#export-progress::-webkit-progress-value {
+  background: var(--lv-primary);
+}
+
+#export-progress::-moz-progress-bar {
+  background: var(--lv-primary);
+}
+
+.lv-export-history {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.lv-export-history li {
+  padding: 12px;
+  background: var(--lv-bg-hover);
+  border: 1px solid var(--lv-border-light);
+  border-radius: var(--lv-radius);
+}
+
+.lv-export-empty {
+  color: var(--lv-text-secondary);
+  font-size: 13px;
+}
+
+.lv-export-title {
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.lv-export-meta {
+  margin-top: 2px;
+  font-size: 12px;
+  color: var(--lv-text-secondary);
+}
+
+.lv-export-error {
+  margin-top: 6px;
+  font-size: 12px;
+  color: var(--lv-danger);
+}
+
+.lv-export-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.lv-export-actions .lv-btn {
+  height: 28px;
+  padding: 0 11px;
+  font-size: 13px;
+  text-decoration: none;
+}
+
+/* ------------------------------------------------------ system status */
+
+.lv-kv {
+  display: grid;
+  grid-template-columns: 130px 1fr;
+  gap: 6px 12px;
+  margin: 0;
+  font-size: 13px;
+}
+
+.lv-kv dt {
+  color: var(--lv-text-secondary);
+}
+
+.lv-kv dd {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+.lv-tone-ok {
+  color: var(--lv-success);
+}
+
+.lv-tone-warn {
+  color: var(--lv-warning);
+}
+
+.lv-full-width {
+  width: 100%;
+}
+
+.lv-link-button {
+  padding: 0;
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 400;
+  color: var(--lv-primary);
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+.lv-link-button:hover {
+  color: var(--lv-primary-hover);
+  text-decoration: underline;
+}
+
+.lv-chip {
+  display: inline-block;
+  padding: 0 7px;
+  font-size: 11px;
+  line-height: 18px;
+  color: var(--lv-text-secondary);
+  background: var(--lv-border-light);
+  border-radius: 9px;
+}
+
+.lv-visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* ------------------------------------------------------ AFMLabel additions */
+
+.lv-page-narrow {
+  max-width: 480px;
+  padding-top: 64px;
+}
+
+.lv-login-card {
+  display: block;
+  padding: 28px 28px 24px;
+}
+
+.lv-login-title {
+  margin: 0 0 8px;
+  font-size: 20px;
+  font-weight: 500;
+}
+
+.lv-login-card .lv-card-meta {
+  margin-bottom: 18px;
+}
+
+.lv-form-error {
+  margin: 0 0 12px;
+  color: var(--lv-danger);
+  font-size: 13px;
+}
+
+.lv-form-error:empty {
+  display: none;
+}
+
+.lv-code {
+  padding: 10px 12px;
+  margin: 0 0 16px;
+  font-family: var(--lv-font-mono);
+  font-size: 13px;
+  background: var(--lv-bg-inset);
+  border: 1px solid var(--lv-border);
+  border-radius: var(--lv-radius);
+  overflow-x: auto;
+}
+
+.lv-user {
+  color: var(--lv-text);
+}
+
+.lv-btn-danger {
+  color: var(--lv-danger);
+  border-color: var(--lv-danger-border);
+}
+
+.lv-btn-danger:hover:not(:disabled) {
+  color: var(--lv-danger);
+  border-color: var(--lv-danger);
+  background: var(--lv-danger-bg);
+}
+
+.lv-btn-small {
+  height: 26px;
+  padding: 0 10px;
+  font-size: 12px;
+}
+
+.lv-section {
+  margin-bottom: 28px;
+}
+
+.lv-section-heading {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0 0 10px;
+  font-size: 16px;
+  font-weight: 500;
+}
+
+.lv-table {
+  width: 100%;
+  margin-bottom: 12px;
+  border-collapse: collapse;
+  font-size: 13px;
+  background: var(--lv-bg-elevated);
+  box-shadow: var(--lv-shadow);
+}
+
+.lv-table th,
+.lv-table td {
+  padding: 6px 10px;
+  text-align: left;
+  border-bottom: 1px solid var(--lv-border-light);
+  vertical-align: middle;
+}
+
+.lv-table th {
+  font-weight: 500;
+  color: var(--lv-text-secondary);
+}
+
+.lv-mono {
+  font-family: var(--lv-font-mono);
+  font-size: 12px;
+}
+
+.lv-input-inline,
+.lv-select-inline {
+  height: 28px;
+  padding: 2px 8px;
+  font-size: 13px;
+  width: 100%;
+  min-width: 90px;
+}
+
+.lv-input-short {
+  width: 80px;
+  min-width: 60px;
+}
+
+.lv-color-input {
+  width: 34px;
+  height: 26px;
+  padding: 0;
+  border: 1px solid var(--lv-border);
+  border-radius: var(--lv-radius);
+  background: var(--lv-bg-inset);
+  cursor: pointer;
+}
+
+.lv-inline-form {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.lv-inline-form .lv-input {
+  flex: 1 1 220px;
+}
+
+.lv-details > summary {
+  cursor: pointer;
+  font-weight: 500;
+  margin-bottom: 8px;
+}
+
+.lv-event-list {
+  list-style: none;
+  margin: 0 0 8px;
+  padding: 0;
+  max-height: 260px;
+  overflow: auto;
+  font-family: var(--lv-font-mono);
+  font-size: 12px;
+  white-space: pre;
+  background: var(--lv-bg-inset);
+  border: 1px solid var(--lv-border-light);
+  border-radius: var(--lv-radius);
+}
+
+.lv-event-list li {
+  padding: 3px 10px;
+  border-bottom: 1px solid var(--lv-border-light);
+}
+
+.lv-chip-warn {
+  color: var(--lv-warning);
+  background: var(--lv-warning-bg);
+}
+
+.lv-dataset-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 12px;
+}
+
+.lv-dataset-grid .lv-empty {
+  grid-column: 1 / -1;
+}
+
+.lv-dataset-card {
+  display: flex;
+  flex-direction: column;
+  background: var(--lv-bg-elevated);
+  border: 1px solid transparent;
+  border-radius: var(--lv-radius);
+  box-shadow: var(--lv-shadow);
+  overflow: hidden;
+  transition: border-color 0.15s;
+}
+
+.lv-dataset-card[hidden] {
+  display: none;
+}
+
+.lv-dataset-card:hover {
+  border-color: var(--lv-primary);
+}
+
+.lv-dataset-thumbs {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2px;
+  background: var(--lv-canvas-bg);
+}
+
+.lv-dataset-thumbs img {
+  display: block;
+  width: 100%;
+  aspect-ratio: 1;
+  object-fit: cover;
+  background: var(--lv-bg-inset);
+}
+
+.lv-dataset-body {
+  padding: 10px 12px 12px;
+}
+
+.lv-dataset-title {
+  margin: 0 0 4px;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--lv-primary);
+}
+
+.lv-dataset-meta {
+  margin: 0;
+  font-size: 12px;
+  color: var(--lv-text-secondary);
+}
+
+.lv-dataset-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 8px;
+  margin-top: 10px;
+}
+
+.lv-dataset-actions .lv-btn {
+  flex: 0 0 auto;
+  white-space: nowrap;
+}
+
+.lv-dataset-actions .lv-btn-danger {
+  margin-left: auto;
+}
+
+.lv-pairing-table td.lv-pair-ok {
+  color: var(--lv-success);
+}
+
+.lv-pairing-table td.lv-pair-missing,
+.lv-pairing-table td.lv-pair-ambiguous,
+.lv-pairing-table td.lv-pair-invalid {
+  color: var(--lv-danger);
+}
+
+.lv-modal-xwide {
+  max-width: 860px;
+}
+
+.lv-file-summary {
+  font-size: 12px;
+  color: var(--lv-text-secondary);
+  margin: 6px 0 0;
+}
+
+/* ===================================================================
+   Button affordance
+   in both themes, accessible focus, contextual help, search, Help page.
+   =================================================================== */
+
+/* Buttons must look interactive (5.1): visible fill/border, hover lift,
+   keyboard focus ring, distinct active/toggled and disabled states. */
+:root {
+  --lv-btn-bg: #1f2324;
+  --lv-btn-border: rgba(255, 255, 255, 0.28);
+  --lv-btn-hover-bg: #2a2f30;
+  --lv-focus-ring: 0 0 0 2px var(--lv-bg-body), 0 0 0 4px var(--lv-primary-hover);
+}
+
+:root[data-theme="light"] {
+  --lv-btn-bg: #ffffff;
+  --lv-btn-border: rgba(0, 0, 0, 0.32);
+  --lv-btn-hover-bg: #eef3f3;
+  --lv-focus-ring: 0 0 0 2px #ffffff, 0 0 0 4px var(--lv-primary);
+}
+
+.lv-btn {
+  background: var(--lv-btn-bg);
+  border-color: var(--lv-btn-border);
+  font-weight: 500;
+  box-shadow: 0 1px 0 rgba(0, 0, 0, 0.25);
+}
+
+.lv-btn:hover:not(:disabled) {
+  background: var(--lv-btn-hover-bg);
+  color: var(--lv-primary-hover);
+  border-color: var(--lv-primary-hover);
+}
+
+.lv-btn:active:not(:disabled),
+.lv-btn[aria-pressed="true"] {
+  background: var(--lv-primary-fade);
+  border-color: var(--lv-primary);
+  color: var(--lv-primary);
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.35);
+}
+
+.lv-btn:disabled,
+.lv-btn[aria-disabled="true"] {
+  opacity: 0.55;
+  box-shadow: none;
+  border-style: dashed;
+}
+
+/* Primary and danger variants must win over the generic .lv-btn fill above
+   (same specificity, later in the file): filled teal with the on-primary
+   text colour in both themes. */
+.lv-btn.lv-btn-primary {
+  color: var(--lv-on-primary);
+  background: var(--lv-primary);
+  border-color: var(--lv-primary);
+  border-style: solid;
+  font-weight: 600;
+  box-shadow: 0 1px 0 rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(0, 0, 0, 0.15) inset;
+}
+
+.lv-btn.lv-btn-primary:hover:not(:disabled) {
+  color: var(--lv-on-primary);
+  background: var(--lv-primary-hover);
+  border-color: var(--lv-primary-hover);
+}
+
+.lv-btn.lv-btn-primary:active:not(:disabled) {
+  color: var(--lv-on-primary);
+  background: var(--lv-primary-active);
+  border-color: var(--lv-primary-active);
+}
+
+/* Disabled primary: still recognisably the primary action, clearly muted,
+   text remains legible (no dark-on-dark). */
+.lv-btn.lv-btn-primary:disabled {
+  color: var(--lv-on-primary);
+  background: var(--lv-primary);
+  border-color: var(--lv-primary);
+  border-style: solid;
+  opacity: 0.45;
+}
+
+.lv-btn.lv-btn-danger {
+  color: var(--lv-danger);
+  background: var(--lv-btn-bg);
+  border-color: var(--lv-danger-border);
+}
+
+.lv-btn.lv-btn-danger:hover:not(:disabled) {
+  color: var(--lv-danger);
+  border-color: var(--lv-danger);
+  background: var(--lv-danger-bg);
+}
+
+.lv-btn-text {
+  box-shadow: none;
+}
+
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible,
+[tabindex]:focus-visible,
+summary:focus-visible {
+  outline: none;
+  box-shadow: var(--lv-focus-ring);
+  border-radius: var(--lv-radius);
+}
+
+.lv-btn:focus-visible {
+  box-shadow: var(--lv-focus-ring);
+}
+
+.lv-link-button:focus-visible {
+  text-decoration: underline;
+}
+
+/* --------------------------------------------------- contextual help */
+
+.lv-tooltip {
+  position: fixed;
+  z-index: 2000;
+  max-width: 320px;
+  padding: 8px 10px;
+  font-size: 12px;
+  line-height: 1.45;
+  color: var(--lv-text);
+  background: var(--lv-bg-elevated);
+  border: 1px solid var(--lv-border);
+  border-radius: var(--lv-radius);
+  box-shadow: var(--lv-shadow-modal);
+  pointer-events: none;
+}
+
+.lv-tooltip[hidden] {
+  display: none;
+}
+
+.lv-tooltip-title {
+  font-weight: 600;
+  margin-bottom: 2px;
+}
+
+.lv-tooltip-title kbd,
+.lv-help-popover kbd {
+  display: inline-block;
+  padding: 0 5px;
+  margin-left: 4px;
+  font-family: var(--lv-font-mono);
+  font-size: 11px;
+  line-height: 16px;
+  color: var(--lv-text-secondary);
+  background: var(--lv-bg-inset);
+  border: 1px solid var(--lv-border-light);
+  border-radius: 3px;
+}
+
+.lv-tooltip-body {
+  color: var(--lv-text);
+}
+
+.lv-tooltip-note {
+  margin-top: 4px;
+  color: var(--lv-warning);
+}
+
+.lv-tooltip-kind {
+  margin-top: 6px;
+  font-size: 11px;
+  color: var(--lv-text-secondary);
+}
+
+.lv-kind-canonical { color: var(--lv-primary); }
+.lv-kind-view { color: var(--lv-info); }
+.lv-kind-review { color: var(--lv-success); }
+.lv-kind-validation { color: var(--lv-success); }
+.lv-kind-destructive { color: var(--lv-danger); }
+
+.lv-help-popover {
+  position: fixed;
+  z-index: 2001;
+  width: 340px;
+  max-width: calc(100vw - 16px);
+  padding: 12px 14px;
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--lv-text);
+  background: var(--lv-bg-elevated);
+  border: 1px solid var(--lv-primary);
+  border-radius: var(--lv-radius);
+  box-shadow: var(--lv-shadow-modal);
+}
+
+.lv-help-popover[hidden] {
+  display: none;
+}
+
+.lv-help-popover p {
+  margin: 6px 0;
+}
+
+.lv-help-popover-header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 4px;
+}
+
+.lv-help-popover-close {
+  margin-left: auto;
+  width: 24px;
+  height: 24px;
+  font-size: 16px;
+  line-height: 1;
+  color: var(--lv-text-secondary);
+  background: none;
+  border: none;
+  border-radius: var(--lv-radius);
+  cursor: pointer;
+}
+
+.lv-help-popover-close:hover {
+  color: var(--lv-text);
+  background: var(--lv-bg-hover);
+}
+
+.lv-help-more {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  padding: 0;
+  margin-left: 4px;
+  font-family: inherit;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--lv-primary);
+  background: transparent;
+  border: 1px solid var(--lv-primary);
+  border-radius: 50%;
+  cursor: help;
+  vertical-align: middle;
+}
+
+.lv-help-more:hover {
+  color: var(--lv-on-primary);
+  background: var(--lv-primary);
+}
+
+/* ------------------------------------------------------ dataset search */
+
+.lv-filter-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin: 0 0 12px;
+}
+
+.lv-filter-bar .lv-input {
+  flex: 1 1 260px;
+  max-width: 420px;
+}
+
+.lv-filter-count {
+  font-size: 13px;
+  color: var(--lv-text-secondary);
+}
+
+.lv-filter-note {
+  color: var(--lv-primary);
+}
+
+.lv-no-results {
+  padding: 24px;
+  color: var(--lv-text-secondary);
+  background: var(--lv-bg-elevated);
+  border-radius: var(--lv-radius);
+  grid-column: 1 / -1;
+}
+
+.lv-export-list {
+  max-height: 320px;
+  overflow: auto;
+  padding: 4px;
+  border: 1px solid var(--lv-border-light);
+  border-radius: var(--lv-radius);
+}
+
+.lv-export-list li {
+  padding: 6px 8px;
+}
+
+.lv-export-list li[hidden] {
+  display: none;
+}
+
+.lv-export-preview {
+  margin: 10px 0 0;
+  padding: 8px 10px;
+  font-family: var(--lv-font-mono);
+  font-size: 12px;
+  color: var(--lv-text-secondary);
+  background: var(--lv-bg-inset);
+  border: 1px solid var(--lv-border-light);
+  border-radius: var(--lv-radius);
+  white-space: pre-wrap;
+}
+
+.lv-choice-required {
+  border-color: var(--lv-warning) !important;
+}
+
+.lv-lossy-summary {
+  margin: 8px 0 0;
+  font-size: 13px;
+}
+
+/* -------------------------------------------------------------- help page */
+
+.lv-help-page {
+  display: grid;
+  grid-template-columns: 280px 1fr;
+  gap: 28px;
+  max-width: 1240px;
+}
+
+.lv-help-sidebar {
+  position: sticky;
+  top: 16px;
+  align-self: start;
+  max-height: calc(100vh - 32px);
+  overflow: auto;
+  font-size: 13px;
+}
+
+.lv-help-index,
+.lv-help-toc {
+  list-style: none;
+  margin: 0 0 16px;
+  padding: 0;
+}
+
+.lv-help-index li {
+  padding: 6px 8px;
+  border-left: 3px solid transparent;
+}
+
+.lv-help-index li.active {
+  border-left-color: var(--lv-primary);
+  background: var(--lv-primary-fade);
+}
+
+.lv-help-index a {
+  font-weight: 500;
+}
+
+.lv-help-summary {
+  display: block;
+  font-size: 12px;
+  color: var(--lv-text-secondary);
+}
+
+.lv-help-missing {
+  color: var(--lv-text-disabled);
+}
+
+.lv-help-toc-title {
+  margin: 12px 0 6px;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.lv-help-toc li {
+  padding: 2px 0;
+}
+
+.lv-help-toc-3 {
+  padding-left: 14px !important;
+  font-size: 12px;
+}
+
+.lv-help-article {
+  min-width: 0;
+  padding: 24px 28px;
+  background: var(--lv-bg-elevated);
+  border-radius: var(--lv-radius);
+  box-shadow: var(--lv-shadow);
+  line-height: 1.6;
+}
+
+.lv-help-article h1 {
+  margin-top: 0;
+  font-size: 24px;
+  font-weight: 500;
+}
+
+.lv-help-article h2 {
+  margin-top: 28px;
+  font-size: 18px;
+  font-weight: 500;
+  padding-bottom: 4px;
+  border-bottom: 1px solid var(--lv-border-light);
+}
+
+.lv-help-article h3 {
+  margin-top: 20px;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.lv-help-article pre {
+  padding: 10px 12px;
+  overflow-x: auto;
+  font-family: var(--lv-font-mono);
+  font-size: 12.5px;
+  background: var(--lv-bg-inset);
+  border: 1px solid var(--lv-border-light);
+  border-radius: var(--lv-radius);
+}
+
+.lv-help-article code {
+  font-family: var(--lv-font-mono);
+  font-size: 12.5px;
+  padding: 0 3px;
+  background: var(--lv-bg-inset);
+  border-radius: 3px;
+}
+
+.lv-help-article pre code {
+  padding: 0;
+  background: none;
+}
+
+.lv-help-table {
+  overflow-x: auto;
+  margin: 10px 0;
+}
+
+.lv-help-table table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+.lv-help-table th,
+.lv-help-table td {
+  padding: 6px 10px;
+  text-align: left;
+  vertical-align: top;
+  border-bottom: 1px solid var(--lv-border-light);
+}
+
+.lv-help-table th {
+  color: var(--lv-text-secondary);
+  font-weight: 500;
+}
+
+.lv-help-article blockquote {
+  margin: 10px 0;
+  padding: 6px 14px;
+  color: var(--lv-text-secondary);
+  border-left: 3px solid var(--lv-primary);
+}
+
+@media (max-width: 900px) {
+  .lv-help-page {
+    grid-template-columns: 1fr;
+  }
+  .lv-help-sidebar {
+    position: static;
+    max-height: none;
+  }
+}

@@ -1,0 +1,91 @@
+# SPDX-License-Identifier: MIT
+# Copyright (c) 2026 IT4Innovations, VSB-Technical University of Ostrava
+# AFMLabel static administrator configuration.
+#
+# Copy to config/app.yaml (git-ignored) and edit. Every value can also be
+# overridden with an environment variable: AFMLABEL_<SECTION>__<KEY>, e.g.
+# AFMLABEL_SERVER__PORT=9090 or AFMLABEL_WORKSPACE__ROOT=/data/afmlabel.
+#
+# Secrets NEVER belong in this file: HF_TOKEN, the application password and
+# the session signing secret are read from the environment / server-side
+# secret files only (see README.md).
+
+schema_version: 1
+
+workspace:
+  root: ./workspace
+  minimum_free_disk_gb: 10
+
+server:
+  host: 127.0.0.1
+  port: 9080
+
+runtime:
+  # auto | cpu | cuda | cuda:N | rocm -- device for optional model inference
+  device: auto
+  maximum_concurrent_inference_jobs: 1
+  resource_refresh_seconds: 2
+  default_backend: fake
+
+models:
+  sam31:
+    enabled: false
+    repository: facebook/sam3.1
+    # Exact Hugging Face commit hash of facebook/sam3.1 (2026-03-27 release),
+    # recorded by scripts/download_models.py; "main" is never accepted.
+    revision: daa63191845a41281374e725f4c9e51c7a824460
+    checkpoint_dir: ./models/sam31
+    # Exact git revision of the official facebookresearch/sam3 code that the
+    # checkpoint was validated against (see README.md, "Optional: local SAM backends").
+    code_revision: 660a5e9e1b8b4c02c0ad97229b88a09a6e4ff5b7
+    allow_cpu: false
+    require_startup_diagnostic: false
+  sam3:
+    # SAM 3 image checkpoint (facebook/sam3, sam3.pt): point, box, mask and
+    # text prompts plus multi-mask proposals through the same pinned code.
+    # Gated on Hugging Face; CUDA recommended (about 3.5 GB checkpoint).
+    # allow_cpu: true enables CPU inference (about 7.7 GiB RAM, first prompt
+    # per image about 13 s on 16 cores); keep false on GPU hosts.
+    enabled: false
+    repository: facebook/sam3
+    revision: 3c879f39826c281e95690f02c7821c4de09afae7
+    checkpoint_dir: ./models/sam3
+    code_revision: 660a5e9e1b8b4c02c0ad97229b88a09a6e4ff5b7
+    allow_cpu: false
+    require_startup_diagnostic: false
+  sam21:
+    # SAM 2.1 base-plus through the transformers port: small (about 320 MB),
+    # CPU-capable, point/box/mask prompts and multi-mask proposals, no text.
+    # Apache-2.0, not gated. Suitable for the CPU-only deployment profile.
+    enabled: false
+    repository: facebook/sam2.1-hiera-base-plus
+    revision: b7320756a13354e7530a63935656d35b2f91a290
+    checkpoint_dir: ./models/sam21
+    allow_cpu: true
+    require_startup_diagnostic: false
+
+security:
+  session_timeout_minutes: 120
+  # Runtime outbound network access is disabled by design: AFM images and
+  # annotations must never leave this host. Model acquisition is a separate,
+  # administrator-initiated script, not a runtime feature.
+  allow_external_runtime_network: false
+
+annotation:
+  # disabled | explicit_class | fill_unlabeled_after_approval
+  boundary_mode: disabled
+  require_overlap_review: true
+
+resources:
+  low_ram_warning_gb: 2
+  low_disk_warning_gb: 10
+
+logging:
+  level: INFO
+  json_output: true
+  # Successful periodic browser polls (resource monitor every 2 s, model
+  # list, lock heartbeat, job status) are dropped from the access log unless:
+  log_polling_requests: false
+
+export:
+  default_profile: nanounet   # or native_exact

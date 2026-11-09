@@ -1,0 +1,28 @@
+{# SPDX-License-Identifier: MIT
+   Copyright (c) 2026 IT4Innovations, VSB-Technical University of Ostrava #}
+{# Environment, resource and backend status. Read-only: the same
+   data /api/v1/health, /api/v1/system/resources and /api/v1/models serve. #}
+<div class="lv-modal-backdrop" id="system-status-modal" hidden>
+  <div class="lv-modal lv-modal-wide" role="dialog" aria-modal="true" aria-labelledby="system-status-heading">
+    <div class="lv-modal-header">
+      <h2 id="system-status-heading">System status</h2>
+      <button type="button" class="lv-modal-close" id="system-status-close-button" aria-label="Close">&times;</button>
+    </div>
+
+    <div class="lv-modal-body">
+      <h3 class="lv-panel-heading">Environment</h3>
+      <dl class="lv-kv" id="health-list"></dl>
+
+      <h3 class="lv-panel-heading" style="margin-top: 20px">Resources</h3>
+      <dl class="lv-kv" id="resources-list"></dl>
+
+      <h3 class="lv-panel-heading" style="margin-top: 20px">Segmentation backends</h3>
+      <dl class="lv-kv" id="backends-list"></dl>
+    </div>
+
+    <div class="lv-modal-footer">
+      <button type="button" class="lv-btn" id="system-status-refresh-button">Refresh</button>
+      <button type="button" class="lv-btn" id="system-status-dismiss-button">Close</button>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,53 @@
+# Python
+__pycache__/
+*.pyc
+*.egg-info/
+.eggs/
+build/
+dist/
+.venv/
+.venv.*/
+venv/
+
+# Tooling caches
+.mypy_cache/
+.ruff_cache/
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Session-local temporary directory (pytest basetemp, scratch files, ad-hoc
+# workspaces). Everything under here is disposable.
+tmp/
+
+# Machine-specific configuration (copy config/app.example.yaml -> config/app.yaml)
+config/app.yaml
+config/developer.local.yaml
+.env
+.env.*
+
+# Secrets must never be committed (HF_TOKEN, password hashes, session keys)
+*.secret
+secrets/
+
+# Model checkpoints -- large, license-encumbered binaries downloaded by
+# scripts/download_models.py; never committed.
+models/*
+
+# Runtime project data (AFM images, annotations, exports) -- never committed
+workspace/
+
+# Playwright
+test-results/
+playwright-report/
+node_modules/
+
+# Editors / OS
+.claude/
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Developer-local test data (AFM images, TSWAT XML) -- never committed
+.data/

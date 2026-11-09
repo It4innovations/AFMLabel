@@ -1,0 +1,1074 @@
+{
+  "$comment": "Centralised contextual help. key -> {screen, label, short, extended?, docs?, kind, shortcut?}. kind: canonical = changes annotation data; view = temporary display state only; review = changes review state only; validation = recomputes/stores validation; navigation = moves/selects without changing data; destructive = removes canonical data (undoable unless stated). docs = help page name + optional #anchor.",
+  "entries": {
+    "project.create": {
+      "screen": "Projects",
+      "label": "Create project",
+      "short": "Create a new project with its own class ontology and dataset pairs.",
+      "kind": "canonical",
+      "docs": "user-guide#create-or-open-a-project"
+    },
+    "project.search": {
+      "screen": "Projects",
+      "label": "Search projects",
+      "short": "Filter the project list by name as you type. Display only; nothing is changed.",
+      "kind": "view"
+    },
+    "project.open": {
+      "screen": "Projects",
+      "label": "Open",
+      "short": "Open the project page with its datasets, classes and audit log.",
+      "kind": "navigation"
+    },
+    "project.delete": {
+      "screen": "Projects",
+      "label": "Delete project",
+      "short": "Move the whole project directory to the workspace trash. An administrator can restore it.",
+      "kind": "destructive",
+      "docs": "user-guide#administration"
+    },
+    "project.rename": {
+      "screen": "Project",
+      "label": "Rename",
+      "short": "Change the project display name. Ids, datasets and classes are untouched.",
+      "kind": "canonical"
+    },
+    "project.import_pairs": {
+      "screen": "Project",
+      "label": "Import images",
+      "short": "Upload one image per channel (e.g. topography and friction); datasets are previewed before any is created.",
+      "kind": "canonical",
+      "docs": "user-guide#import-images"
+    },
+    "project.import_xml": {
+      "screen": "Project",
+      "label": "Import XML annotations",
+      "short": "Import legacy TSWAT / CVAT XML shapes as independent regions. Overlaps are preserved and start unreviewed.",
+      "kind": "canonical",
+      "docs": "user-guide#xml-import-tswat--cvat"
+    },
+    "project.export": {
+      "screen": "Project",
+      "label": "Export",
+      "short": "Open the export dialog. Only datasets validated at their current revision can be exported.",
+      "kind": "navigation",
+      "docs": "user-guide#export"
+    },
+    "project.lock": {
+      "screen": "Project",
+      "label": "Editing lock",
+      "short": "Shows which browser tab holds the editing lock. Other tabs open the project read-only.",
+      "kind": "view",
+      "docs": "user-guide#editing-lock"
+    },
+    "project.system_status": {
+      "screen": "Shell",
+      "label": "System status",
+      "short": "Show host resources, model backends and privacy state. Read-only.",
+      "kind": "view"
+    },
+    "project.theme": {
+      "screen": "Shell",
+      "label": "Theme",
+      "short": "Switch between the dark and light theme. Stored in this browser only.",
+      "kind": "view"
+    },
+    "project.help": {
+      "screen": "Shell",
+      "label": "Help",
+      "short": "Open the local documentation (user guide, workflow, SAM, import/export, shortcuts). No network needed.",
+      "kind": "navigation",
+      "docs": "user-guide"
+    },
+    "dataset.search": {
+      "screen": "Project",
+      "label": "Search datasets",
+      "short": "Filter the dataset list by original filename, pairing key, name or id (case-insensitive substring). Next/Previous in the workspace follow the filtered list while a filter is active.",
+      "kind": "view",
+      "docs": "user-guide#find-a-dataset-search"
+    },
+    "dataset.search_clear": {
+      "screen": "Project",
+      "label": "Clear filter",
+      "short": "Remove the dataset filter and show every dataset again.",
+      "kind": "view"
+    },
+    "dataset.annotate": {
+      "screen": "Project",
+      "label": "Annotate",
+      "short": "Open the annotation workspace for this dataset pair.",
+      "kind": "navigation"
+    },
+    "dataset.replace_source": {
+      "screen": "Project",
+      "label": "Replace source",
+      "short": "Replace one channel's image after a compatibility check (same dimensions and calibration). Annotations are kept; validation becomes stale.",
+      "kind": "canonical",
+      "docs": "user-guide#replace-a-source-image"
+    },
+    "dataset.import_mask": {
+      "screen": "Project",
+      "label": "Import mask",
+      "short": "Import a flattened label raster (PNG/TIFF) as regions. Lossy: original overlaps cannot be reconstructed.",
+      "kind": "canonical",
+      "docs": "user-guide#flattened-mask-import-lossy"
+    },
+    "dataset.delete": {
+      "screen": "Project",
+      "label": "Delete dataset",
+      "short": "Move the dataset and its annotations to the workspace trash.",
+      "kind": "destructive"
+    },
+    "dataset.status_validated": {
+      "screen": "Project",
+      "label": "validated",
+      "short": "The stored validation report matches the current dataset revision; the dataset can be exported.",
+      "kind": "view"
+    },
+    "dataset.status_blocked": {
+      "screen": "Project",
+      "label": "blocked",
+      "short": "The source pair has a problem (see the reason); the dataset cannot be validated or exported until it is fixed.",
+      "kind": "view"
+    },
+    "import.upload_preview": {
+      "screen": "Import pairs",
+      "label": "Upload and preview pairing",
+      "short": "Upload the selected files and show how they pair. Nothing is committed until you confirm the preview.",
+      "kind": "canonical",
+      "docs": "user-guide#preview-the-pairing"
+    },
+    "import.allow_order": {
+      "screen": "Import pairs",
+      "label": "Pair by sorted order",
+      "short": "Fallback when no identifiers exist in the filenames: files are paired by sorted name order. You confirm the order is correct.",
+      "kind": "canonical"
+    },
+    "import.commit": {
+      "screen": "Import pairs",
+      "label": "Create datasets",
+      "short": "Create one dataset per OK pair; problem rows are skipped and listed.",
+      "kind": "canonical"
+    },
+    "import.pair_status": {
+      "screen": "Import images",
+      "label": "Dataset status",
+      "short": "OK rows can be created; a missing channel, ambiguous id, invalid file, dimension or calibration mismatch must be fixed first.",
+      "kind": "view"
+    },
+    "replace.check": {
+      "screen": "Replace source",
+      "label": "Upload and check compatibility",
+      "short": "Upload the candidate and compare dimensions, calibration and checksum with the current image. Nothing is replaced yet.",
+      "kind": "canonical"
+    },
+    "replace.confirm": {
+      "screen": "Replace source",
+      "label": "Confirm replacement",
+      "short": "Swap the source image. The dataset revision increases and the previous validation becomes stale.",
+      "kind": "canonical"
+    },
+    "xml.file": {
+      "screen": "Import XML",
+      "label": "CVAT for images 1.1 XML",
+      "short": "The TSWAT/CVAT export. Images are matched to datasets by source filename; dimension mismatches are refused, never resampled.",
+      "kind": "canonical",
+      "docs": "user-guide#xml-import-tswat--cvat"
+    },
+    "xml.target_dataset": {
+      "screen": "Import XML",
+      "label": "Target dataset",
+      "short": "Only for a single XML image that cannot be matched by filename: choose the dataset explicitly.",
+      "kind": "canonical"
+    },
+    "xml.stage": {
+      "screen": "Import XML",
+      "label": "Upload and preview",
+      "short": "Parse the XML and show image matches and label-to-class mapping. Nothing is imported yet.",
+      "kind": "canonical"
+    },
+    "xml.class_mapping": {
+      "screen": "Import XML",
+      "label": "Class for XML label",
+      "short": "Map each XML label to an existing class, create a new class, or skip those shapes.",
+      "kind": "canonical"
+    },
+    "xml.commit": {
+      "screen": "Import XML",
+      "label": "Import regions",
+      "short": "Create one region per shape with full XML provenance. Every imported overlap starts unreviewed.",
+      "kind": "canonical"
+    },
+    "lossy.file": {
+      "screen": "Import mask",
+      "label": "Label raster",
+      "short": "Single-channel PNG/TIFF where 0 is unlabelled and every other value is a label. Must have the dataset's exact dimensions.",
+      "kind": "canonical",
+      "docs": "user-guide#flattened-mask-import-lossy"
+    },
+    "lossy.stage": {
+      "screen": "Import mask",
+      "label": "Upload and preview values",
+      "short": "Decode the raster and list its values with pixel and component counts. The dimension check happens here; nothing is imported yet.",
+      "kind": "canonical"
+    },
+    "lossy.target_class": {
+      "screen": "Import mask",
+      "label": "Target class",
+      "short": "Class assigned to this raster value. Buffer is proposed when the project has a Buffer class; otherwise choose explicitly. 'Do not import this value' discards it only after confirmation.",
+      "kind": "canonical",
+      "docs": "user-guide#default-class-and-value-mapping"
+    },
+    "lossy.split": {
+      "screen": "Import mask",
+      "label": "One region per connected component",
+      "short": "Each connected component becomes its own editable region; unticked, one region per value.",
+      "kind": "canonical"
+    },
+    "lossy.confirm_discard": {
+      "screen": "Import mask",
+      "label": "Confirm discarded values",
+      "short": "Required before committing when any raster value is marked 'do not import'. Discarded pixels stay unlabelled.",
+      "kind": "canonical"
+    },
+    "lossy.commit": {
+      "screen": "Import mask",
+      "label": "Import as lossy regions",
+      "short": "Create the regions (marked lossy_import, validation keeps warning), then open the workspace with them selected.",
+      "kind": "canonical"
+    },
+    "lossy.warning": {
+      "screen": "Import mask",
+      "label": "Lossy import warning",
+      "short": "A flattened raster has already lost overlaps and hidden regions; they cannot be reconstructed. Prefer the XML import when the source annotation exists.",
+      "kind": "view"
+    },
+    "export.profile": {
+      "screen": "Export",
+      "label": "Profile",
+      "short": "NanoUNet (default): Topography/Friction/Masks_instance layout verified against the downstream loader. Native exact: masks, regions, validation and sources for provenance.",
+      "kind": "canonical",
+      "docs": "user-guide#profiles"
+    },
+    "export.mask_semantics": {
+      "screen": "Export",
+      "label": "Mask values",
+      "short": "Value per pixel in the machine-readable mask: class export id (default) or a unique id per winning region.",
+      "kind": "canonical",
+      "docs": "user-guide#machine-readable-mask"
+    },
+    "export.boundary_policy": {
+      "screen": "Export",
+      "label": "Boundary-class pixels",
+      "short": "Export Boundary-role pixels as their class value, or as 0 which the downstream evaluation ignores.",
+      "kind": "canonical",
+      "docs": "user-guide#boundary-policy"
+    },
+    "export.raster_format": {
+      "screen": "Export",
+      "label": "Mask file format",
+      "short": "Container of the machine mask: uncompressed TIFF (loader default) or PNG. Values are identical uint16 scalars either way.",
+      "kind": "canonical",
+      "docs": "user-guide#png-and-tiff"
+    },
+    "export.color_visualization": {
+      "screen": "Export",
+      "label": "Colour visualisation",
+      "short": "Also write mask_color.png: an RGB image of the same final composition using the exact class colours from the GUI, for viewing in any image viewer. The machine mask stays scalar.",
+      "kind": "canonical",
+      "docs": "user-guide#colour-visualisation"
+    },
+    "export.search": {
+      "screen": "Export",
+      "label": "Search datasets",
+      "short": "Filter the export dataset list by name, original filename, pairing key or validation status.",
+      "kind": "view"
+    },
+    "export.select_all": {
+      "screen": "Export",
+      "label": "Select all validated",
+      "short": "Tick every dataset in the filtered list that is validated at its current revision.",
+      "kind": "view"
+    },
+    "export.dataset_row": {
+      "screen": "Export",
+      "label": "Dataset",
+      "short": "Only datasets validated at their current revision are exported; stale or never-validated ones are listed and skipped.",
+      "kind": "view",
+      "docs": "user-guide#validation-requirement"
+    },
+    "export.filename_preview": {
+      "screen": "Export",
+      "label": "Filename preview",
+      "short": "Names are derived from the original filenames (pairing key), sanitised, identical across Topography/Friction/Masks directories; the manifest records both names.",
+      "kind": "view",
+      "docs": "user-guide#file-naming"
+    },
+    "export.run": {
+      "screen": "Export",
+      "label": "Create export",
+      "short": "Compose, write and package the selected datasets. Export is derived data; the annotation is unchanged.",
+      "kind": "canonical"
+    },
+    "export.download": {
+      "screen": "Export",
+      "label": "Download",
+      "short": "Download the ZIP package of this export.",
+      "kind": "navigation"
+    },
+    "export.delete": {
+      "screen": "Export",
+      "label": "Delete export",
+      "short": "Remove this export package from the workspace. Annotations are not affected.",
+      "kind": "destructive"
+    },
+    "class.name": {
+      "screen": "Classes",
+      "label": "Class name",
+      "short": "Display name; must be unique. Identity is the numeric id and stable key, not the name.",
+      "kind": "canonical"
+    },
+    "class.color": {
+      "screen": "Classes",
+      "label": "Class colour",
+      "short": "Display colour used on the canvas, in the Regions list and in the exported colour mask. Changing it never changes mask values.",
+      "kind": "canonical"
+    },
+    "class.stable_key": {
+      "screen": "Classes",
+      "label": "Stable key",
+      "short": "Machine identifier derived from the first name; never changes and is written into every export manifest.",
+      "kind": "view"
+    },
+    "class.role": {
+      "screen": "Classes",
+      "label": "Semantic role",
+      "short": "MaterialLayer, Boundary or Unspecified. At most one enabled Boundary class; it is used by the Boundary policy and fill.",
+      "kind": "canonical",
+      "docs": "user-guide#boundary"
+    },
+    "class.export_id": {
+      "screen": "Classes",
+      "label": "Export id",
+      "short": "Value written into machine-readable masks for this class. Empty means the class id.",
+      "kind": "canonical",
+      "docs": "user-guide#class-mapping"
+    },
+    "class.enabled": {
+      "screen": "Classes",
+      "label": "Enabled",
+      "short": "Disabled classes are excluded from composition and cannot be assigned; regions still using one block validation.",
+      "kind": "canonical"
+    },
+    "class.delete": {
+      "screen": "Classes",
+      "label": "Delete class",
+      "short": "Remove the class. Refused while any region uses it; disable it instead.",
+      "kind": "destructive"
+    },
+    "class.add": {
+      "screen": "Classes",
+      "label": "Add class",
+      "short": "Create a class with a new stable id. Available to every dataset of the project.",
+      "kind": "canonical"
+    },
+    "ws.back": {
+      "screen": "Annotation",
+      "label": "Back to project",
+      "short": "Return to the project page. Pending autosaves are flushed first.",
+      "kind": "navigation"
+    },
+    "ws.prev_dataset": {
+      "screen": "Annotation",
+      "label": "Previous dataset",
+      "short": "Open the previous dataset. With a dataset filter active, moves within the filtered list.",
+      "kind": "navigation",
+      "shortcut": "PageUp"
+    },
+    "ws.next_dataset": {
+      "screen": "Annotation",
+      "label": "Next dataset",
+      "short": "Open the next dataset. With a dataset filter active, moves within the filtered list.",
+      "kind": "navigation",
+      "shortcut": "PageDown"
+    },
+    "ws.undo": {
+      "screen": "Annotation",
+      "label": "Undo",
+      "short": "Revert the last edit, including Merge, Split, Subtract by Order and Delete Selected. The restored state is saved and validation becomes stale.",
+      "kind": "canonical",
+      "shortcut": "Ctrl+Z",
+      "docs": "user-guide#undo-and-redo"
+    },
+    "ws.redo": {
+      "screen": "Annotation",
+      "label": "Redo",
+      "short": "Re-apply the last undone edit with the identical result.",
+      "kind": "canonical",
+      "shortcut": "Ctrl+Y"
+    },
+    "ws.save": {
+      "screen": "Annotation",
+      "label": "Saved / Saving",
+      "short": "Autosave state. Every edit is saved as a new dataset revision; click to flush pending saves.",
+      "kind": "view",
+      "shortcut": "Ctrl+S"
+    },
+    "ws.validate": {
+      "screen": "Annotation",
+      "label": "Validate",
+      "short": "Recompute Findings for the current annotation revision and store the validation report that gates export. Does not change any region.",
+      "kind": "validation",
+      "shortcut": "Ctrl+Enter",
+      "docs": "user-guide#validate"
+    },
+    "ws.export": {
+      "screen": "Annotation",
+      "label": "Export",
+      "short": "Go to the project export dialog.",
+      "kind": "navigation"
+    },
+    "ws.backend": {
+      "screen": "Annotation",
+      "label": "Backend",
+      "short": "Segmentation model used for SAM proposals. Selecting a real model loads it on the server; unavailable backends state why.",
+      "kind": "view",
+      "docs": "user-guide#sam-proposals"
+    },
+    "ws.lock": {
+      "screen": "Annotation",
+      "label": "Editing lock",
+      "short": "Whether this tab may edit. Read-only sessions can look but not change anything.",
+      "kind": "view"
+    },
+    "ws.help": {
+      "screen": "Annotation",
+      "label": "Help",
+      "short": "Open the local documentation in a new tab.",
+      "kind": "navigation",
+      "docs": "user-guide"
+    },
+    "tool.select": {
+      "screen": "Annotation toolbar",
+      "label": "Select",
+      "short": "Click a region on the canvas to select it; Ctrl+click adds or removes it from the selection.",
+      "kind": "navigation",
+      "shortcut": "V"
+    },
+    "tool.pan": {
+      "screen": "Annotation toolbar",
+      "label": "Pan",
+      "short": "Drag to move the view. Space+drag or middle mouse pans in any tool.",
+      "kind": "view",
+      "shortcut": "H"
+    },
+    "tool.polygon": {
+      "screen": "Annotation toolbar",
+      "label": "Polygon",
+      "short": "Click vertices, Enter or double-click closes and creates a region of the active class. Shift+Enter adds to the selected region, Alt+Enter subtracts.",
+      "kind": "canonical",
+      "shortcut": "P",
+      "docs": "user-guide#polygon"
+    },
+    "tool.brush": {
+      "screen": "Annotation toolbar",
+      "label": "Brush",
+      "short": "Paint pixels. Extends the selected region when it has the active class; otherwise the stroke creates a new region of the active class, also over existing or locked regions (the overlap becomes a Finding).",
+      "kind": "canonical",
+      "shortcut": "B",
+      "docs": "user-guide#brush-rules"
+    },
+    "tool.eraser": {
+      "screen": "Annotation toolbar",
+      "label": "Eraser",
+      "short": "Remove pixels from the selected region only. Locked regions are not erased.",
+      "kind": "canonical",
+      "shortcut": "E"
+    },
+    "tool.sam_positive": {
+      "screen": "Annotation toolbar",
+      "label": "SAM positive point",
+      "short": "Add a point that must belong to the proposal. The model returns a proposal; nothing changes until you accept it.",
+      "kind": "canonical",
+      "shortcut": "Q",
+      "docs": "user-guide#prompts"
+    },
+    "tool.sam_negative": {
+      "screen": "Annotation toolbar",
+      "label": "SAM negative point",
+      "short": "Add a point that must be excluded from the proposal.",
+      "kind": "canonical",
+      "shortcut": "W",
+      "docs": "user-guide#prompts"
+    },
+    "tool.sam_box": {
+      "screen": "Annotation toolbar",
+      "label": "SAM box prompt",
+      "short": "Drag a box around the structure to segment. Points can refine the result.",
+      "kind": "canonical",
+      "shortcut": "X",
+      "docs": "user-guide#prompts"
+    },
+    "tool.fit": {
+      "screen": "Annotation toolbar",
+      "label": "Fit to view",
+      "short": "Zoom so the whole image is visible. Display only.",
+      "kind": "view",
+      "shortcut": "F"
+    },
+    "tool.zoom_in": {
+      "screen": "Annotation toolbar",
+      "label": "Zoom in",
+      "short": "Zoom the view in around the centre. Display only.",
+      "kind": "view",
+      "shortcut": "+"
+    },
+    "tool.zoom_out": {
+      "screen": "Annotation toolbar",
+      "label": "Zoom out",
+      "short": "Zoom the view out around the centre. Display only.",
+      "kind": "view",
+      "shortcut": "-"
+    },
+    "tool.clear_selection": {
+      "screen": "Annotation toolbar",
+      "label": "Clear selection",
+      "short": "Deselect every region and leave the edit context; the next brush stroke starts a new region of the active class. No region is changed or deleted.",
+      "kind": "navigation",
+      "shortcut": "Esc",
+      "docs": "user-guide#clear-selection"
+    },
+    "polygon.finish": {
+      "screen": "Annotation",
+      "label": "Finish polygon",
+      "short": "Close the polygon and create a region of the active class.",
+      "kind": "canonical",
+      "shortcut": "Enter"
+    },
+    "polygon.cancel": {
+      "screen": "Annotation",
+      "label": "Cancel polygon",
+      "short": "Discard the polygon vertices placed so far.",
+      "kind": "navigation",
+      "shortcut": "Esc"
+    },
+    "prompt.refine": {
+      "screen": "Annotation",
+      "label": "Refine selected region",
+      "short": "Send the selected region as a mask prompt with your points/box (backends with mask prompts only). The region changes only if you accept the proposal.",
+      "kind": "canonical",
+      "docs": "user-guide#refining"
+    },
+    "prompt.text": {
+      "screen": "Annotation",
+      "label": "Text prompt",
+      "short": "Enter runs the concept detector for the typed text (backends with text prompts). Points cannot be combined with text.",
+      "kind": "canonical",
+      "docs": "user-guide#prompts"
+    },
+    "proposal.variant": {
+      "screen": "Annotation",
+      "label": "Proposal variant",
+      "short": "Choose between the proposal masks the model returned; the white overlay shows the current one.",
+      "kind": "view"
+    },
+    "proposal.accept": {
+      "screen": "Annotation",
+      "label": "Accept as region",
+      "short": "Create a new region of the active class from the proposal, with model provenance recorded. Undoable.",
+      "kind": "canonical"
+    },
+    "proposal.add": {
+      "screen": "Annotation",
+      "label": "Add to selected",
+      "short": "Merge the proposal pixels into the selected region. Undoable.",
+      "kind": "canonical"
+    },
+    "proposal.reject": {
+      "screen": "Annotation",
+      "label": "Reject",
+      "short": "Discard the proposal. Nothing was changed.",
+      "kind": "navigation"
+    },
+    "proposal.clear": {
+      "screen": "Annotation",
+      "label": "Clear prompts",
+      "short": "Remove the placed points/box and any proposal. Nothing was changed.",
+      "kind": "navigation"
+    },
+    "class.active": {
+      "screen": "Annotation",
+      "label": "Active class",
+      "short": "Class given to new regions created by brush, polygon or accepted SAM proposals. Changing it never re-colours or reclassifies existing regions.",
+      "kind": "view",
+      "docs": "user-guide#active-class"
+    },
+    "class.quick_add": {
+      "screen": "Classes panel",
+      "label": "Add class",
+      "short": "Create a class from the workspace and make it active.",
+      "kind": "canonical"
+    },
+    "class.item": {
+      "screen": "Classes panel",
+      "label": "Class",
+      "short": "Click to make the class active. The number is the stable class id used in exports; the role tag marks Boundary classes.",
+      "kind": "view"
+    },
+    "status.coverage": {
+      "screen": "Annotation status bar",
+      "label": "Coverage",
+      "short": "Share of pixels labelled after z-order composition. Click to open Findings.",
+      "kind": "navigation"
+    },
+    "status.missing": {
+      "screen": "Annotation status bar",
+      "label": "Missing",
+      "short": "Unlabelled pixels in the final composition. Click to highlight them and open Findings.",
+      "kind": "navigation"
+    },
+    "status.overlaps": {
+      "screen": "Annotation status bar",
+      "label": "Overlaps",
+      "short": "Overlap groups and how many are unreviewed. Click to open Findings.",
+      "kind": "navigation"
+    },
+    "status.validation": {
+      "screen": "Annotation status bar",
+      "label": "Validation",
+      "short": "State of the stored validation report: not run, valid at rN, stale (dataset changed since) or blocked.",
+      "kind": "view"
+    },
+    "status.resources": {
+      "screen": "Annotation status bar",
+      "label": "Host resources",
+      "short": "Live CPU, RAM, disk and GPU figures of the server; warnings when RAM or disk run low.",
+      "kind": "view"
+    },
+    "status.backend": {
+      "screen": "Annotation status bar",
+      "label": "Backend state",
+      "short": "Which segmentation backends are currently available.",
+      "kind": "view"
+    },
+    "regions.tab": {
+      "screen": "Regions panel",
+      "label": "Regions",
+      "short": "All regions of the dataset, top of the list first. Higher rows win where regions overlap.",
+      "kind": "view",
+      "docs": "user-guide#z-order"
+    },
+    "regions.row": {
+      "screen": "Regions panel",
+      "label": "Region row",
+      "short": "Click selects, Ctrl+click toggles, Shift+click selects a range, drag reorders z-order. A yellow left edge marks participation in an overlap.",
+      "kind": "navigation",
+      "docs": "user-guide#selecting-regions"
+    },
+    "regions.checkbox": {
+      "screen": "Regions panel",
+      "label": "Select region",
+      "short": "Add or remove this region from the selection used by Merge checked, Subtract by Order and Delete Selected.",
+      "kind": "navigation"
+    },
+    "regions.class": {
+      "screen": "Regions panel",
+      "label": "Region class",
+      "short": "Reassign this region to another class. Geometry is unchanged; undoable.",
+      "kind": "canonical"
+    },
+    "regions.visible": {
+      "screen": "Regions panel",
+      "label": "Show / hide",
+      "short": "Hidden regions are not drawn and are excluded from composition; they block validation until shown or deleted.",
+      "kind": "canonical"
+    },
+    "regions.lock": {
+      "screen": "Regions panel",
+      "label": "Lock region",
+      "short": "Prevent geometry edits, class changes and deletion of this region until it is unlocked. Locked regions stay in the composition and can be overlapped by new regions.",
+      "kind": "canonical",
+      "docs": "user-guide#locked-regions"
+    },
+    "regions.locked_badge": {
+      "screen": "Regions panel",
+      "label": "Locked region",
+      "short": "Locked region — editing disabled. Unlock it to edit or delete.",
+      "kind": "view"
+    },
+    "regions.delete": {
+      "screen": "Regions panel",
+      "label": "Delete region",
+      "short": "Delete this region after confirmation. Undo restores it with the same id.",
+      "kind": "destructive",
+      "shortcut": "Delete"
+    },
+    "regions.select_all": {
+      "screen": "Regions panel",
+      "label": "Select All",
+      "short": "Select every region currently listed.",
+      "kind": "navigation",
+      "shortcut": "Ctrl+A"
+    },
+    "regions.clear_selection": {
+      "screen": "Regions panel",
+      "label": "Clear selection",
+      "short": "Deselect all regions without changing them; the brush then starts a new region of the active class.",
+      "kind": "navigation",
+      "shortcut": "Esc"
+    },
+    "regions.delete_selected": {
+      "screen": "Regions panel",
+      "label": "Delete Selected",
+      "short": "Delete every selected region in one undoable step after confirmation. Locked regions are kept and listed.",
+      "kind": "destructive",
+      "shortcut": "Delete",
+      "docs": "user-guide#delete-selected"
+    },
+    "regions.split": {
+      "screen": "Regions panel",
+      "label": "Split",
+      "short": "Separate the disconnected parts of the selected region into their own regions of the same class. One undo restores the original region.",
+      "kind": "canonical",
+      "docs": "user-guide#split"
+    },
+    "regions.merge": {
+      "screen": "Regions panel",
+      "label": "Merge checked",
+      "short": "Merge the selected regions of the same class into one editable region. Refused when classes differ. One undo restores every original region with its id.",
+      "kind": "canonical",
+      "docs": "user-guide#merge"
+    },
+    "regions.subtract": {
+      "screen": "Regions panel",
+      "label": "Subtract by Order",
+      "short": "Remove pixels of higher-priority selected regions from lower-priority selected regions using the current Regions list order, so the selected regions no longer overlap. Non-selected regions are untouched; regions that would become empty need confirmation. Undoable.",
+      "kind": "canonical",
+      "docs": "user-guide#subtract-by-order"
+    },
+    "regions.duplicate": {
+      "screen": "Regions panel",
+      "label": "Duplicate",
+      "short": "Copy the selected region directly above it in z-order.",
+      "kind": "canonical"
+    },
+    "findings.tab": {
+      "screen": "Findings panel",
+      "label": "Findings",
+      "short": "Validation and review items: overlaps, missing coverage, hidden regions, class and policy problems. A Finding is never geometry.",
+      "kind": "view",
+      "docs": "user-guide#findings"
+    },
+    "findings.validate": {
+      "screen": "Findings panel",
+      "label": "Validate",
+      "short": "Recompute Findings for the current annotation revision and store the report that gates export. Does not change any region.",
+      "kind": "validation",
+      "shortcut": "Ctrl+Enter",
+      "docs": "user-guide#validate"
+    },
+    "findings.refresh": {
+      "screen": "Findings panel",
+      "label": "Refresh",
+      "short": "Reload the live Findings list from the current canonical state.",
+      "kind": "view"
+    },
+    "findings.filter_status": {
+      "screen": "Findings panel",
+      "label": "Review filter",
+      "short": "Show all, only unreviewed or only reviewed Findings.",
+      "kind": "view"
+    },
+    "findings.filter_severity": {
+      "screen": "Findings panel",
+      "label": "Severity filter",
+      "short": "Show all, only blocking (prevent export) or only warning Findings.",
+      "kind": "view"
+    },
+    "findings.filter_type": {
+      "screen": "Findings panel",
+      "label": "Type filter",
+      "short": "Show only one Finding type; the list contains the types present in this dataset.",
+      "kind": "view"
+    },
+    "findings.row": {
+      "screen": "Findings panel",
+      "label": "Finding",
+      "short": "Click navigates the canvas to it and highlights the regions; Ctrl+click toggles, Shift+click selects a range.",
+      "kind": "navigation"
+    },
+    "findings.severity": {
+      "screen": "Findings panel",
+      "label": "Severity",
+      "short": "Blocking Findings prevent export until corrected or, for overlaps, reviewed; warnings are informative.",
+      "kind": "view"
+    },
+    "findings.review_state": {
+      "screen": "Findings panel",
+      "label": "Review state",
+      "short": "Unreviewed overlaps block export; reviewed means you acknowledged the current z-order result. Geometry edits reset the review.",
+      "kind": "view",
+      "docs": "user-guide#reviewing-overlaps"
+    },
+    "findings.stale": {
+      "screen": "Findings panel",
+      "label": "Stale validation",
+      "short": "The stored validation report belongs to an older revision. The list below is live; run Validate to store a current report before export.",
+      "kind": "view"
+    },
+    "findings.select_all": {
+      "screen": "Findings panel",
+      "label": "Select all visible",
+      "short": "Select every Finding matching the current filters.",
+      "kind": "navigation",
+      "shortcut": "Ctrl+A"
+    },
+    "findings.mark_selected": {
+      "screen": "Findings panel",
+      "label": "Mark Selected Reviewed",
+      "short": "Acknowledge the current z-order result of the selected overlaps. Changes review state only; it never subtracts or edits geometry, and blocking non-overlap Findings cannot be waived.",
+      "kind": "review",
+      "shortcut": "R",
+      "docs": "user-guide#reviewing-overlaps"
+    },
+    "findings.mark_visible": {
+      "screen": "Findings panel",
+      "label": "Mark All Visible Reviewed",
+      "short": "Acknowledge every overlap matching the current filters. Review state only, no geometry change.",
+      "kind": "review"
+    },
+    "findings.review_resolved": {
+      "screen": "Findings panel",
+      "label": "Resolved by order",
+      "short": "Acknowledge that the region on top is the correct winner. Review state only.",
+      "kind": "review"
+    },
+    "findings.review_intentional": {
+      "screen": "Findings panel",
+      "label": "Intentional",
+      "short": "The overlap is intended; z-order decides the final class. Review state only.",
+      "kind": "review"
+    },
+    "findings.review_reset": {
+      "screen": "Findings panel",
+      "label": "Reset review",
+      "short": "Mark the overlap unreviewed again.",
+      "kind": "review"
+    },
+    "findings.boundary_fill": {
+      "screen": "Findings panel",
+      "label": "Boundary fill",
+      "short": "Assign exactly the unlabelled pixels to the Boundary class after confirming the count. Never overwrites a label. Undoable.",
+      "kind": "canonical",
+      "docs": "user-guide#boundary"
+    },
+    "view.opacity": {
+      "screen": "View controls",
+      "label": "Overlay opacity",
+      "short": "Transparency of the region overlays. Display only.",
+      "kind": "view"
+    },
+    "view.brush_radius": {
+      "screen": "View controls",
+      "label": "Brush radius",
+      "short": "Radius of brush and eraser strokes in image pixels.",
+      "kind": "view",
+      "shortcut": "[ / ]"
+    },
+    "view.zoom": {
+      "screen": "View controls",
+      "label": "Zoom",
+      "short": "Magnification of the view. Display only.",
+      "kind": "view"
+    },
+    "view.brightness": {
+      "screen": "View controls",
+      "label": "Brightness",
+      "short": "Change only the displayed source-image brightness. The original image, annotation data, SAM input, validation and export are unchanged; not saved.",
+      "kind": "view",
+      "docs": "user-guide#brightness-and-contrast-view-only"
+    },
+    "view.contrast": {
+      "screen": "View controls",
+      "label": "Contrast",
+      "short": "Change only the displayed source-image contrast. Region colours are not affected; nothing is saved or exported.",
+      "kind": "view",
+      "docs": "user-guide#brightness-and-contrast-view-only"
+    },
+    "view.reset": {
+      "screen": "View controls",
+      "label": "Reset View",
+      "short": "Return Brightness and Contrast of the shown channel to neutral (the original rendering).",
+      "kind": "view"
+    },
+    "view.show_overlaps": {
+      "screen": "View controls",
+      "label": "Mark overlaps",
+      "short": "Hatch pixels covered by more than one region. Display only.",
+      "kind": "view"
+    },
+    "view.show_missing": {
+      "screen": "View controls",
+      "label": "Mark missing pixels",
+      "short": "Dot pixels no region covers. Display only.",
+      "kind": "view"
+    },
+    "project.channel_count": {
+      "screen": "Projects",
+      "label": "Images per dataset",
+      "short": "How many co-registered source images every dataset carries (1-64). 2 is the classic topography + friction pair. Fixed once the project has datasets.",
+      "kind": "canonical",
+      "docs": "user-guide#channels"
+    },
+    "project.channels": {
+      "screen": "Project",
+      "label": "Channels",
+      "short": "The project's source channels: label (shown in the UI), key (files, API, export folders) and filename tokens used to pair uploaded files. Editable only while the project has no datasets.",
+      "kind": "canonical",
+      "docs": "user-guide#channels"
+    },
+    "project.channel_label": {
+      "screen": "Project",
+      "label": "Channel label",
+      "short": "Display name of the channel (buttons, navigator, dataset cards, export folder for non-classic channels).",
+      "kind": "canonical",
+      "docs": "user-guide#channels"
+    },
+    "project.channel_key": {
+      "screen": "Project",
+      "label": "Channel key",
+      "short": "Stable machine identifier (lowercase, digits, underscore). Derived from the label for new channels; never changes once saved.",
+      "kind": "canonical",
+      "docs": "user-guide#channels"
+    },
+    "project.channel_tokens": {
+      "screen": "Project",
+      "label": "Filename tokens",
+      "short": "Words removed from uploaded filenames to obtain the pairing key, and used by the all-channels picker to sort files (e.g. 'phase, ph').",
+      "kind": "canonical",
+      "docs": "user-guide#channels"
+    },
+    "project.channel_add": {
+      "screen": "Project",
+      "label": "Add channel",
+      "short": "Append another source channel (up to 64). Save to apply.",
+      "kind": "canonical",
+      "docs": "user-guide#channels"
+    },
+    "project.channel_remove": {
+      "screen": "Project",
+      "label": "Remove channel",
+      "short": "Remove this channel from the draft. At least one channel must remain. Save to apply.",
+      "kind": "canonical"
+    },
+    "project.channel_save": {
+      "screen": "Project",
+      "label": "Save channels",
+      "short": "Store the channel definitions in the project (new revision). Refused once datasets exist.",
+      "kind": "canonical",
+      "docs": "user-guide#channels"
+    },
+    "import.channel_files": {
+      "screen": "Import images",
+      "label": "Channel files",
+      "short": "Select every image of this channel for the batch (TIFF/PNG/JPEG). Files of different channels are grouped by the identifier left after removing the channel tokens.",
+      "kind": "canonical",
+      "docs": "user-guide#import-images"
+    },
+    "import.auto_files": {
+      "screen": "Import images",
+      "label": "All channels at once",
+      "short": "Select files of every channel together; each file is assigned to the channel whose filename token it contains. Files matching no token are listed and skipped.",
+      "kind": "canonical",
+      "docs": "user-guide#import-images"
+    },
+    "replace.channel": {
+      "screen": "Replace source",
+      "label": "Channel",
+      "short": "Which source image of the dataset to replace.",
+      "kind": "canonical"
+    },
+    "ws.channel": {
+      "screen": "Annotation",
+      "label": "Source channel",
+      "short": "Switch the displayed source image. Annotations, zoom, pan, selection and tool stay; SAM uses the shown channel.",
+      "kind": "view",
+      "shortcut": "1-9 / Tab / Shift+Tab",
+      "docs": "user-guide#channels"
+    },
+    "ws.channel_prev": {
+      "screen": "Annotation",
+      "label": "Previous channel",
+      "short": "Show the previous source channel (also Shift+Tab or mouse wheel over the navigator).",
+      "kind": "view",
+      "shortcut": "Shift+Tab"
+    },
+    "ws.channel_next": {
+      "screen": "Annotation",
+      "label": "Next channel",
+      "short": "Show the next source channel (also Tab or mouse wheel over the navigator).",
+      "kind": "view",
+      "shortcut": "Tab"
+    },
+    "ws.channel_slider": {
+      "screen": "Annotation",
+      "label": "Channel slider",
+      "short": "Drag to scrub through the source channels; the image switches while dragging.",
+      "kind": "view"
+    },
+    "ws.channel_index": {
+      "screen": "Annotation",
+      "label": "Channel number",
+      "short": "Type a channel number and press Enter to jump to it.",
+      "kind": "view",
+      "shortcut": "1-9, 0 = 10"
+    },
+    "ws.channel_select": {
+      "screen": "Annotation",
+      "label": "Channel name",
+      "short": "Pick a source channel by name.",
+      "kind": "view"
+    },
+    "tool.fill": {
+      "screen": "Annotation toolbar",
+      "label": "Fill enclosed gap",
+      "short": "Click inside an unlabelled area that is already enclosed by regions: the connected unlabelled pixels become a new region of the active class (and get the optional name). Never changes existing regions.",
+      "kind": "canonical",
+      "shortcut": "G",
+      "docs": "user-guide#fill-tool"
+    },
+    "fill.gap": {
+      "screen": "Annotation",
+      "label": "Close gaps (px)",
+      "short": "Boundaries are thickened by this many pixels before filling, so the fill cannot leak through openings narrower than about twice the value. 0 = exact flood fill.",
+      "kind": "view",
+      "docs": "user-guide#fill-tool"
+    },
+    "fill.connectivity": {
+      "screen": "Annotation",
+      "label": "Connectivity",
+      "short": "4-connected ignores diagonal leaks between corner-touching pixels (safer); 8-connected also crosses diagonals.",
+      "kind": "view",
+      "docs": "user-guide#fill-tool"
+    },
+    "fill.name": {
+      "screen": "Annotation",
+      "label": "Name for filled regions",
+      "short": "Optional region name given to every region the fill tool creates. Leave empty for unnamed regions.",
+      "kind": "view"
+    },
+    "fill.all": {
+      "screen": "Annotation",
+      "label": "Fill all enclosed gaps",
+      "short": "Create one region of the active class per enclosed unlabelled area in one transaction, after confirming the count and pixel total. One undo removes them all.",
+      "kind": "canonical",
+      "docs": "user-guide#fill-tool"
+    },
+    "fill.include_border": {
+      "screen": "Annotation",
+      "label": "Include border areas",
+      "short": "Also fill unlabelled areas that touch the image border; by default only fully enclosed areas are filled.",
+      "kind": "view"
+    }
+  }
+}

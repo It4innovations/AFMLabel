@@ -1,0 +1,33 @@
+{# SPDX-License-Identifier: MIT
+   Copyright (c) 2026 IT4Innovations, VSB-Technical University of Ostrava #}
+{% extends "base.html" %}
+{% block title %}Sign in{% endblock %}
+{% block nav %}{% endblock %}
+{% block header_right %}{% endblock %}
+
+{% block content %}
+<main class="lv-page lv-page-narrow">
+  <section class="lv-card lv-login-card">
+    <div class="lv-card-main">
+      <h1 class="lv-login-title">Sign in to AFMLabel</h1>
+      <p class="lv-card-meta">Single-account, self-hosted annotation workspace. Credentials are configured on the server with <code>afmlabel auth set-password</code>.</p>
+      <form id="login-form" autocomplete="on" data-next="{{ next }}">
+        <div class="lv-field">
+          <label class="lv-label" for="username">Username</label>
+          <input type="text" id="username" name="username" class="lv-input lv-full-width" required autocomplete="username" autofocus />
+        </div>
+        <div class="lv-field">
+          <label class="lv-label" for="password">Password</label>
+          <input type="password" id="password" name="password" class="lv-input lv-full-width" required autocomplete="current-password" />
+        </div>
+        <p id="login-error" class="lv-form-error" role="alert"></p>
+        <button type="submit" class="lv-btn lv-btn-primary lv-full-width" id="login-button">Sign in</button>
+      </form>
+    </div>
+  </section>
+</main>
+{% endblock %}
+
+{% block scripts %}
+<script type="module" src="{{ asset_url('js/login.js') }}"></script>
+{% endblock %}

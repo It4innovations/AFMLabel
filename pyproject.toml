@@ -1,0 +1,103 @@
+# SPDX-License-Identifier: MIT
+# Copyright (c) 2026 IT4Innovations, VSB-Technical University of Ostrava
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "afmlabel"
+version = "0.3.0"
+description = "AFM multi-channel image annotation, segmentation, validation, and export tool"
+readme = "README.md"
+license = { text = "MIT" }
+authors = [{ name = "IT4Innovations, VSB-Technical University of Ostrava" }]
+# 3.12 is the floor because the pinned official SAM 3 code
+# requires Python >= 3.12; FastAPI itself would run on older interpreters.
+# Development on this project happens on 3.13 (see README.md).
+requires-python = ">=3.12"
+dependencies = [
+    "fastapi>=0.115",
+    "uvicorn[standard]>=0.32",
+    "pydantic>=2.9",
+    "pydantic-settings>=2.6",
+    "pyyaml>=6.0",
+    "numpy>=1.26",
+    "pillow>=10.4",
+    "tifffile>=2024.8",
+    "python-multipart>=0.0.12",
+    "jinja2>=3.1",
+    "psutil>=6.0",
+    "argon2-cffi>=23.1",
+    "pycocotools>=2.0.7",
+]
+
+[project.optional-dependencies]
+# Optional model support. Device selection is an environment
+# concern: install the matching torch build first, see README.md.
+sam = [
+    "torch>=2.5",
+    "torchvision>=0.20",
+    "huggingface_hub>=0.26",
+    # SAM 2.1 image backend (transformers port); SAM 3 / 3.1 need the pinned
+    # official code installed separately (README.md).
+    "transformers>=4.56",
+]
+dev = [
+    "pytest>=8.3",
+    "pytest-cov>=5.0",
+    "pytest-playwright>=0.5",
+    "httpx>=0.27",
+    "ruff>=0.7",
+    "mypy>=1.13",
+    "types-PyYAML>=6.0",
+    "types-psutil>=6.0",
+    "types-pycocotools",
+]
+
+[project.scripts]
+afmlabel = "afmlabel.main:cli"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/afmlabel"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+src = ["src", "tests", "scripts"]
+extend-exclude = ["tmp", "workspace", "models"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B"]
+# B008: FastAPI dependency injection idiom (Depends/Query in defaults).
+ignore = ["B008"]
+
+[tool.mypy]
+python_version = "3.12"
+mypy_path = "src"
+explicit_package_bases = true
+warn_unused_configs = true
+disallow_untyped_defs = true
+warn_redundant_casts = true
+warn_unused_ignores = true
+no_implicit_optional = true
+
+[[tool.mypy.overrides]]
+module = [
+    "uvicorn.*",
+    "torch.*",
+    "torchvision.*",
+    "huggingface_hub.*",
+    "tifffile.*",
+]
+ignore_missing_imports = true
+
+[tool.pytest.ini_options]
+minversion = "8.0"
+testpaths = ["tests"]
+markers = [
+    "real_model: requires a downloaded SAM checkpoint and the 'sam' extra (never run in CPU-only CI)",
+    "gpu: requires a supported GPU",
+    "browser: requires Playwright browsers to be installed (playwright install)",
+]
+# All temporary test data stays inside the repository's ignored tmp/ directory.
+addopts = "-ra --basetemp=tmp/pytest"

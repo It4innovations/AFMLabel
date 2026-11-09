@@ -1,0 +1,25 @@
+{
+  "export_id": "exp_0123456789",
+  "project_id": "proj_0123456789",
+  "profile_id": "nanounet",
+  "created_at": "2026-08-02T10:00:00.000+00:00",
+  "app_version": "0.1.0",
+  "options": {"boundary_policy": "class", "mask_semantics": "class", "include_regions": true},
+  "datasets": [
+    {
+      "dataset_id": "ds_abcdef0123", "dataset_name": "239", "export_stem": "239",
+      "width": 4, "height": 4, "dataset_revision": 3, "validated_revision": 3,
+      "composition_sha256": "00", "files": {"mask": "Masks_instance/239.tif"},
+      "topography_sha256": "aa", "friction_sha256": "bb", "region_count": 2,
+      "class_pixel_histogram": {"1": 15, "2": 1}, "overlap_groups": 1,
+      "overlap_review_summary": {"reviewed_intentional": 1}, "boundary_fill_used": false,
+      "provenance_summary": {}, "warnings": []
+    }
+  ],
+  "skipped": [],
+  "package_filename": "afmlabel-nanounet-exp_0123456789.zip",
+  "package_sha256": "cc",
+  "package_size_bytes": 1234,
+  "class_mapping": [],
+  "actor": "tester"
+}

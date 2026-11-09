@@ -1,0 +1,72 @@
+{
+  "schema_version": 1,
+  "dataset_id": "ds_abcdef0123",
+  "project_id": "proj_0123456789",
+  "name": "239",
+  "pairing_key": "239",
+  "topography": {
+    "modality": "topography",
+    "stored_filename": "topography.tiff",
+    "original_filename": "239_topography.tiff",
+    "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "size_bytes": 8192,
+    "width": 64,
+    "height": 64,
+    "dtype": "uint16",
+    "bit_depth": 16,
+    "channels": 1,
+    "format": "TIFF",
+    "lossy_format": false,
+    "calibration": {
+      "pixel_size_x": null,
+      "pixel_size_y": null,
+      "unit": null,
+      "source": null
+    },
+    "imported_at": "2026-08-01T10:00:00.000+00:00",
+    "metadata": {}
+  },
+  "friction": {
+    "modality": "friction",
+    "stored_filename": "friction.tiff",
+    "original_filename": "239_friction.tiff",
+    "sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+    "size_bytes": 8192,
+    "width": 64,
+    "height": 64,
+    "dtype": "uint16",
+    "bit_depth": 16,
+    "channels": 1,
+    "format": "TIFF",
+    "lossy_format": false,
+    "calibration": {
+      "pixel_size_x": null,
+      "pixel_size_y": null,
+      "unit": null,
+      "source": null
+    },
+    "imported_at": "2026-08-01T10:00:00.000+00:00",
+    "metadata": {}
+  },
+  "width": 64,
+  "height": 64,
+  "created_at": "2026-08-01T10:00:00.000+00:00",
+  "modified_at": "2026-08-02T10:00:00.000+00:00",
+  "revision": 3,
+  "status": "ready",
+  "block_reason": null,
+  "validated_revision": null,
+  "import_batch_id": "batch_0123456789",
+  "pairing_method": "key",
+  "replacements": [
+    {
+      "modality": "friction",
+      "replaced_at": "2026-08-02T10:00:00.000+00:00",
+      "previous_sha256": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+      "new_sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+      "previous_original_filename": "239_friction_old.tiff",
+      "new_original_filename": "239_friction.tiff",
+      "dataset_revision_before": 2
+    }
+  ]
+}

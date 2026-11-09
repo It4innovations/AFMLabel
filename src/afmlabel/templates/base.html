@@ -1,0 +1,44 @@
+<!doctype html>
+{# SPDX-License-Identifier: MIT
+   Copyright (c) 2026 IT4Innovations, VSB-Technical University of Ostrava #}
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>AFMLabel — {% block title %}{% endblock %}</title>
+  {% include "_theme_head.html" %}
+  <link rel="icon" href="{{ asset_url('img/favicon.svg') }}" type="image/svg+xml" />
+  <link rel="stylesheet" href="{{ asset_url('css/app.css') }}" />
+  <script type="importmap">{{ import_map_json() | safe }}</script>
+  {% block head %}{% endblock %}
+</head>
+<body {% block body_attrs %}{% endblock %}>
+  {% block header %}
+  <header class="lv-header">
+    <a class="lv-brand" href="https://blender.it4i.cz/" target="_blank" rel="noopener">
+      <img
+        class="lv-brand-logo"
+        src="{{ asset_url('img/it4i-logo.png') }}"
+        alt="IT4Innovations"
+      />
+    </a>
+    <span class="lv-logo">AFMLabel</span>
+    <nav class="lv-nav">
+      {% block nav %}<a href="/" class="active">Projects</a>{% endblock %}
+    </nav>
+    <div class="lv-header-right">
+      {% block header_right %}{% endblock %}
+      <a class="lv-btn lv-btn-text" id="open-help-button" href="/help" data-help="project.help">Help</a>
+      <button type="button" class="lv-btn lv-btn-text" id="open-system-status-button" data-help="project.system_status">System status</button>
+      <button type="button" class="lv-btn lv-btn-text lv-btn-icon lv-theme-toggle" id="theme-toggle" data-help="project.theme"></button>
+    </div>
+  </header>
+  {% endblock %}
+
+  {% block content %}{% endblock %}
+
+  {% include "_system_status_dialog.html" %}
+  <script type="module" src="{{ asset_url('js/shell.js') }}"></script>
+  {% block scripts %}{% endblock %}
+</body>
+</html>

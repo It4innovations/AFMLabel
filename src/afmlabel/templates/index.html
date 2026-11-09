@@ -1,0 +1,115 @@
+{# SPDX-License-Identifier: MIT
+   Copyright (c) 2026 IT4Innovations, VSB-Technical University of Ostrava #}
+{% extends "base.html" %}
+{% block title %}Projects{% endblock %}
+{% block header_right %}
+  {% if session %}<span class="lv-user" id="current-user">{{ session.username }}</span>
+  <button type="button" class="lv-btn lv-btn-text" id="logout-button" data-help-trivial>Sign out</button>{% endif %}
+{% endblock %}
+
+{% block content %}
+<main class="lv-page">
+  <div class="lv-toolbar">
+    <div class="lv-search">
+      <input type="search" id="project-search" class="lv-input" placeholder="Search ..." aria-label="Search projects by name" data-help="project.search" />
+      <button type="button" class="lv-search-button" id="project-search-button" aria-label="Search" data-help="project.search">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round">
+          <circle cx="11" cy="11" r="7" /><path d="m20 20-3.5-3.5" />
+        </svg>
+      </button>
+    </div>
+    <span class="lv-count" id="project-count">{{ projects|length }} project{{ "" if projects|length == 1 else "s" }}</span>
+    <div class="lv-toolbar-right">
+      <button type="button" class="lv-btn lv-btn-primary" id="create-project-button" data-help="project.create">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round">
+          <path d="M12 5v14M5 12h14" />
+        </svg>
+        Create project
+      </button>
+    </div>
+  </div>
+
+  <section id="project-list">
+    {% for project in projects %}
+    <article class="lv-card" data-project-name="{{ project.name|lower }}" data-project-id="{{ project.project_id }}">
+      {% if project.first_dataset_id %}
+      <img class="lv-card-thumb" src="/api/v1/projects/{{ project.project_id }}/datasets/{{ project.first_dataset_id }}/thumbnail/{{ project.first_channel_key }}" alt="" loading="lazy" onerror="this.removeAttribute('src')" />
+      {% else %}
+      <div class="lv-card-thumb" role="presentation"></div>
+      {% endif %}
+      <div class="lv-card-main">
+        <h2 class="lv-card-title">
+          <span class="lv-card-id">#{{ project.project_id[-6:] }}:</span>
+          {{ project.name }}
+        </h2>
+        <p class="lv-card-meta">Created {{ project.created_at[:19].replace("T", " ") }} &middot; revision {{ project.revision }}</p>
+        <p class="lv-card-meta">{{ project.dataset_count }} dataset{{ "" if project.dataset_count == 1 else "s" }} &middot; {{ project.channel_count }} channel{{ "" if project.channel_count == 1 else "s" }} &middot; {{ project.class_count }} class{{ "" if project.class_count == 1 else "es" }}</p>
+      </div>
+      <div class="lv-card-actions">
+        <span class="lv-status lv-status-{{ 'in_progress' if project.status == 'active' else 'pending' }}">{{ project.status }}</span>
+        <div class="lv-card-buttons">
+          <button type="button" class="lv-btn lv-btn-danger lv-delete-button" data-help="project.delete" data-project-id="{{ project.project_id }}" data-project-title="{{ project.name }}" data-revision="{{ project.revision }}">Delete</button>
+          <a class="lv-btn lv-open-button" href="/projects/{{ project.project_id }}" data-help="project.open">Open</a>
+        </div>
+      </div>
+    </article>
+    {% else %}
+    <div class="lv-empty">
+      <h2>No projects yet</h2>
+      <p>Create a project and import co-registered AFM images (for example topography + friction) to start annotating.</p>
+    </div>
+    {% endfor %}
+  </section>
+
+  <p class="lv-empty" id="no-search-results" hidden>No project matches your search.</p>
+</main>
+
+<div class="lv-modal-backdrop" id="create-project-modal" hidden>
+  <div class="lv-modal" role="dialog" aria-modal="true" aria-labelledby="create-project-heading">
+    <div class="lv-modal-header">
+      <h2 id="create-project-heading">Create project</h2>
+      <button type="button" class="lv-modal-close" id="close-create-modal-button" aria-label="Close">&times;</button>
+    </div>
+    <form id="create-project-form">
+      <div class="lv-modal-body">
+        <div class="lv-field">
+          <label class="lv-label" for="project_name">Project name</label>
+          <input type="text" id="project_name" name="project_name" class="lv-input lv-full-width" required maxlength="200" autocomplete="off" />
+          <p class="lv-hint">A project holds one class ontology and any number of datasets; every dataset carries one image per channel.</p>
+        </div>
+        <div class="lv-field">
+          <label class="lv-label" for="project_channel_count">Images per dataset (channels)</label>
+          <input type="number" id="project_channel_count" name="project_channel_count" class="lv-input lv-input-short" min="1" max="64" step="1" value="2" required data-help="project.channel_count" />
+          <p class="lv-hint" id="project_channel_hint">2 = the classic topography + friction pair. Some AFM instruments export more co-registered images (phase, amplitude, …); up to 64 channels share one annotation. Channel names and filename tokens can be edited on the project page before the first import.</p>
+        </div>
+        <p id="create-project-error" class="lv-form-error" role="alert"></p>
+      </div>
+      <div class="lv-modal-footer">
+        <button type="button" class="lv-btn" id="cancel-create-modal-button">Cancel</button>
+        <button type="submit" class="lv-btn lv-btn-primary" id="submit-create-project-button">Create project</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div class="lv-modal-backdrop" id="delete-project-modal" hidden>
+  <div class="lv-modal" role="dialog" aria-modal="true" aria-labelledby="delete-project-heading">
+    <div class="lv-modal-header">
+      <h2 id="delete-project-heading">Delete project</h2>
+      <button type="button" class="lv-modal-close" id="close-delete-modal-button" aria-label="Close">&times;</button>
+    </div>
+    <div class="lv-modal-body">
+      <p>Delete <strong id="delete-project-name"></strong>? The project directory is moved to the workspace trash and can be restored by an administrator.</p>
+      <p id="delete-project-error" class="lv-form-error" role="alert"></p>
+    </div>
+    <div class="lv-modal-footer">
+      <button type="button" class="lv-btn" id="cancel-delete-modal-button">Cancel</button>
+      <button type="button" class="lv-btn lv-btn-danger" id="confirm-delete-project-button">Delete</button>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script type="module" src="{{ asset_url('js/projects.js') }}"></script>
+{% endblock %}

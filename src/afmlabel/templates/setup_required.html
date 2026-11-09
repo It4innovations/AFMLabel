@@ -1,0 +1,27 @@
+{# SPDX-License-Identifier: MIT
+   Copyright (c) 2026 IT4Innovations, VSB-Technical University of Ostrava #}
+{% extends "base.html" %}
+{% block title %}Setup required{% endblock %}
+{% block nav %}{% endblock %}
+{% block header_right %}{% endblock %}
+
+{% block content %}
+<main class="lv-page lv-page-narrow">
+  <section class="lv-card lv-login-card">
+    <div class="lv-card-main">
+      <h1 class="lv-login-title">Account setup required</h1>
+      <p class="lv-card-meta">
+        AFMLabel supports exactly one user account and it has not been created yet.
+        Accounts are created on the server, never through the browser. Run, inside the
+        application virtual environment:
+      </p>
+      <pre class="lv-code">afmlabel auth set-password --username &lt;name&gt;</pre>
+      <p class="lv-card-meta">
+        The command prompts for the password (or reads <code>AFMLABEL_PASSWORD</code> from the
+        environment) and stores only an Argon2id hash under the workspace. Reload this page afterwards.
+      </p>
+      <a class="lv-btn lv-btn-primary" href="/login">Continue to sign in</a>
+    </div>
+  </section>
+</main>
+{% endblock %}

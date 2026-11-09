@@ -1,0 +1,209 @@
+{
+  "$comment": "Shortcut registry. scope: global = anywhere in the workspace except text fields; regions = when the Regions panel has focus; findings = when the Findings panel has focus; canvas = while the given tool is active. Shortcuts never fire while typing in an input.",
+  "shortcuts": [
+    {
+      "id": "undo",
+      "keys": "Ctrl+Z",
+      "scope": "global",
+      "description": "Undo the last edit (also Merge, Split, Subtract by Order, Delete Selected)"
+    },
+    {
+      "id": "redo",
+      "keys": "Ctrl+Y / Ctrl+Shift+Z",
+      "scope": "global",
+      "description": "Redo"
+    },
+    {
+      "id": "save",
+      "keys": "Ctrl+S",
+      "scope": "global",
+      "description": "Flush pending autosave (edits autosave anyway)"
+    },
+    {
+      "id": "validate",
+      "keys": "Ctrl+Enter",
+      "scope": "global",
+      "description": "Validate / revalidate the dataset"
+    },
+    {
+      "id": "escape",
+      "keys": "Esc",
+      "scope": "global",
+      "description": "Clear selection, cancel polygon, clear SAM prompts, close popover"
+    },
+    {
+      "id": "tool.select",
+      "keys": "V",
+      "scope": "global",
+      "description": "Select tool"
+    },
+    {
+      "id": "tool.pan",
+      "keys": "H",
+      "scope": "global",
+      "description": "Pan tool (Space+drag or middle mouse pans in any tool)"
+    },
+    {
+      "id": "tool.polygon",
+      "keys": "P",
+      "scope": "global",
+      "description": "Polygon tool"
+    },
+    {
+      "id": "tool.brush",
+      "keys": "B",
+      "scope": "global",
+      "description": "Brush tool"
+    },
+    {
+      "id": "tool.eraser",
+      "keys": "E",
+      "scope": "global",
+      "description": "Eraser tool"
+    },
+    {
+      "id": "tool.fill",
+      "keys": "G",
+      "scope": "global",
+      "description": "Fill tool (click an enclosed unlabelled area to create a region of the active class)"
+    },
+    {
+      "id": "brush.smaller",
+      "keys": "[",
+      "scope": "global",
+      "description": "Decrease brush radius"
+    },
+    {
+      "id": "brush.larger",
+      "keys": "]",
+      "scope": "global",
+      "description": "Increase brush radius"
+    },
+    {
+      "id": "tool.sam_positive",
+      "keys": "Q",
+      "scope": "global",
+      "description": "SAM positive point (when the backend supports points)"
+    },
+    {
+      "id": "tool.sam_negative",
+      "keys": "W",
+      "scope": "global",
+      "description": "SAM negative point"
+    },
+    {
+      "id": "tool.sam_box",
+      "keys": "X",
+      "scope": "global",
+      "description": "SAM box prompt"
+    },
+    {
+      "id": "channel.select",
+      "keys": "1 … 9 / 0",
+      "scope": "global",
+      "description": "Show source channel 1-9 (0 = channel 10)"
+    },
+    {
+      "id": "channel.next",
+      "keys": "Tab",
+      "scope": "global",
+      "description": "Next source channel (wraps around)"
+    },
+    {
+      "id": "channel.previous",
+      "keys": "Shift+Tab",
+      "scope": "global",
+      "description": "Previous source channel"
+    },
+    {
+      "id": "view.fit",
+      "keys": "F",
+      "scope": "global",
+      "description": "Fit image to view"
+    },
+    {
+      "id": "view.zoom_in",
+      "keys": "+ / =",
+      "scope": "global",
+      "description": "Zoom in (mouse wheel zooms around the cursor)"
+    },
+    {
+      "id": "view.zoom_out",
+      "keys": "-",
+      "scope": "global",
+      "description": "Zoom out"
+    },
+    {
+      "id": "polygon.finish",
+      "keys": "Enter",
+      "scope": "canvas",
+      "description": "Polygon: close and create a region (Shift+Enter adds to selected, Alt+Enter subtracts)"
+    },
+    {
+      "id": "polygon.back",
+      "keys": "Backspace / right click",
+      "scope": "canvas",
+      "description": "Polygon: remove the last vertex"
+    },
+    {
+      "id": "regions.toggle",
+      "keys": "Ctrl+Click",
+      "scope": "regions",
+      "description": "Toggle a region in the selection (also on the canvas with the Select tool)"
+    },
+    {
+      "id": "regions.range",
+      "keys": "Shift+Click",
+      "scope": "regions",
+      "description": "Select a contiguous range of regions from the anchor"
+    },
+    {
+      "id": "regions.select_all",
+      "keys": "Ctrl+A",
+      "scope": "regions",
+      "description": "Select all listed regions"
+    },
+    {
+      "id": "regions.delete",
+      "keys": "Delete",
+      "scope": "global",
+      "description": "Delete the selected region(s) after confirmation (locked ones are kept)"
+    },
+    {
+      "id": "findings.toggle",
+      "keys": "Ctrl+Click",
+      "scope": "findings",
+      "description": "Toggle a Finding in the selection"
+    },
+    {
+      "id": "findings.range",
+      "keys": "Shift+Click",
+      "scope": "findings",
+      "description": "Select a contiguous range of Findings"
+    },
+    {
+      "id": "findings.select_all",
+      "keys": "Ctrl+A",
+      "scope": "findings",
+      "description": "Select all visible (filtered) Findings"
+    },
+    {
+      "id": "findings.mark_reviewed",
+      "keys": "R",
+      "scope": "findings",
+      "description": "Mark the selected overlap Findings reviewed (review state only)"
+    },
+    {
+      "id": "dataset.previous",
+      "keys": "PageUp",
+      "scope": "global",
+      "description": "Previous dataset (within the filtered list when a filter is active)"
+    },
+    {
+      "id": "dataset.next",
+      "keys": "PageDown",
+      "scope": "global",
+      "description": "Next dataset (within the filtered list when a filter is active)"
+    }
+  ]
+}

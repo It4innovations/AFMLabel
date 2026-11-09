@@ -1,0 +1,50 @@
+{# SPDX-License-Identifier: MIT
+   Copyright (c) 2026 IT4Innovations, VSB-Technical University of Ostrava #}
+{% extends "base.html" %}
+{% block title %}Help{% if doc %} — {{ doc.title }}{% endif %}{% endblock %}
+{% block nav %}<a href="/">Projects</a><a href="/help" class="active">Help</a>{% endblock %}
+{% block header_right %}
+  {% if session %}<span class="lv-user" id="current-user">{{ session.username }}</span>
+  <button type="button" class="lv-btn lv-btn-text" id="logout-button">Sign out</button>{% endif %}
+{% endblock %}
+{% block body_attrs %}id="help-body"{% endblock %}
+
+{% block content %}
+<main class="lv-page lv-help-page">
+  <aside class="lv-help-sidebar" aria-label="Help contents">
+    <h2 class="lv-section-heading">Documentation</h2>
+    <p class="lv-hint">Served from the local <code>docs/</code> directory. No network access is needed.</p>
+    <ul class="lv-help-index" id="help-index">
+      {% for entry in index %}
+      <li class="{% if doc and doc.name == entry.name %}active{% endif %}">
+        {% if entry.available %}<a href="/help/{{ entry.name }}">{{ entry.title }}</a>{% else %}<span class="lv-help-missing" title="file not present">{{ entry.title }}</span>{% endif %}
+        <span class="lv-help-summary">{{ entry.summary }}</span>
+      </li>
+      {% endfor %}
+    </ul>
+    {% if doc and not doc.missing and doc.headings %}
+    <h3 class="lv-help-toc-title">On this page</h3>
+    <ul class="lv-help-toc">
+      {% for h in doc.headings %}<li class="lv-help-toc-{{ h.level }}"><a href="#{{ h.anchor }}">{{ h.text }}</a></li>{% endfor %}
+    </ul>
+    {% endif %}
+  </aside>
+  <article class="lv-help-article" id="help-article">
+    {% if doc is none %}
+      <h1>AFMLabel Help</h1>
+      <p>Open the <a href="/help/user-guide">user guide</a>. Tooltips in the application link to its relevant sections; the guide ends with the complete keyboard-shortcut table.</p>
+      <h2 id="shortcuts">Keyboard shortcuts at a glance</h2>
+      <div class="lv-help-table"><table>
+        <thead><tr><th>Keys</th><th>Scope</th><th>Action</th></tr></thead>
+        <tbody>
+        {% for s in shortcuts %}<tr><td><code>{{ s["keys"] }}</code></td><td>{{ s.scope }}</td><td>{{ s.description }}</td></tr>{% endfor %}
+        </tbody></table></div>
+    {% elif doc.missing %}
+      <h1>Document not found</h1>
+      <p>There is no help page named <code>{{ doc.name }}</code>. Pick one from the list.</p>
+    {% else %}
+      {{ doc.html | safe }}
+    {% endif %}
+  </article>
+</main>
+{% endblock %}
