@@ -1,0 +1,159 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="900" viewBox="0 0 1200 900" font-family="Arial, Helvetica, sans-serif" font-size="13">
+  <title>AFMLabel annotation-to-export workflow</title>
+  <defs>
+    <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#444"/>
+    </marker>
+    <style>
+      .st{fill:#ffffff;stroke:#555;stroke-width:1.3}
+      .h{font-weight:bold;font-size:14px}
+      .s{font-size:12px;fill:#333}
+      .m{font-family:Consolas, 'Courier New', monospace;font-size:11.5px;fill:#222}
+      .ln{stroke:#444;stroke-width:1.5;fill:none;marker-end:url(#arr)}
+      .dash{stroke:#b03030;stroke-width:1.4;fill:none;stroke-dasharray:6 4;marker-end:url(#arr)}
+      .lane{font-weight:bold;font-size:13px;fill:#555}
+    </style>
+  </defs>
+  <rect width="1200" height="900" fill="#ffffff"/>
+  <text x="600" y="30" text-anchor="middle" font-weight="bold" font-size="18">Annotation-to-export workflow (every arrow is an explicit user action)</text>
+
+  <!-- 1 project -->
+  <rect x="30" y="56" width="250" height="118" rx="8" class="st" fill="#eaf2fb"/>
+  <text x="44" y="78" class="h">1  Project setup</text>
+  <text x="44" y="98" class="s">name + channels per dataset (1-64)</text>
+  <text x="44" y="115" class="s">channel label / key / filename tokens</text>
+  <text x="44" y="132" class="s">class ontology: id, stable key, colour,</text>
+  <text x="44" y="149" class="s">role (MaterialLayer / Boundary /</text>
+  <text x="44" y="166" class="s">Unspecified), export id</text>
+
+  <!-- 2 import -->
+  <rect x="320" y="56" width="270" height="118" rx="8" class="st" fill="#eaf2fb"/>
+  <text x="334" y="78" class="h">2  Import and pairing</text>
+  <text x="334" y="98" class="s">upload batch (TIFF / PNG / JPEG) to tmp/</text>
+  <text x="334" y="115" class="s">pairing key = filename minus channel tokens</text>
+  <text x="334" y="132" class="s">preview rows: OK / Missing channel /</text>
+  <text x="334" y="149" class="s">Ambiguous / Invalid / Dimension or</text>
+  <text x="334" y="166" class="s">Calibration mismatch - only OK committed</text>
+
+  <!-- 3 dataset -->
+  <rect x="630" y="56" width="250" height="118" rx="8" class="st" fill="#eaf2fb"/>
+  <text x="644" y="78" class="h">3  Dataset created</text>
+  <text x="644" y="98" class="s">one source file per channel, SHA-256,</text>
+  <text x="644" y="115" class="s">dimensions, dtype, calibration;</text>
+  <text x="644" y="132" class="s">one shared annotation grid (W x H);</text>
+  <text x="644" y="149" class="s">nothing is resampled;</text>
+  <text x="644" y="166" class="s">revision r1, audit event</text>
+
+  <!-- optional imports -->
+  <rect x="920" y="56" width="250" height="118" rx="8" class="st" fill="#f6f6f6"/>
+  <text x="934" y="78" class="h">Optional annotation import</text>
+  <text x="934" y="98" class="s">CVAT 1.1 XML (TSWAT): one region</text>
+  <text x="934" y="115" class="s">per shape, overlaps kept unreviewed</text>
+  <text x="934" y="132" class="s">Flattened mask (lossy): value -&gt;</text>
+  <text x="934" y="149" class="s">class mapping, one region per</text>
+  <text x="934" y="166" class="s">component, source = lossy_import</text>
+
+  <path d="M280,115 L318,115" class="ln"/>
+  <path d="M590,115 L628,115" class="ln"/>
+  <path d="M1045,174 L1045,232 L800,232 L800,248" class="ln"/>
+  <path d="M700,174 L700,248" class="ln"/>
+
+  <!-- 4 annotation lane -->
+  <rect x="30" y="250" width="1140" height="190" rx="10" fill="#eef7ee" stroke="#4b8b4b" stroke-width="1.5"/>
+  <text x="46" y="274" class="lane" fill="#2d6a2d">4  Annotation workspace - regions are independent objects (class, mask, z-order, visibility, lock, provenance); overlaps are allowed</text>
+  <rect x="46" y="288" width="200" height="100" rx="6" class="st"/>
+  <text x="56" y="308" class="h">Manual tools</text>
+  <text x="56" y="327" class="s">brush / eraser (B, E)</text>
+  <text x="56" y="344" class="s">polygon (P), add / subtract</text>
+  <text x="56" y="361" class="s">fill (G): seed or "fill all</text>
+  <text x="56" y="378" class="s">enclosed gaps"</text>
+  <rect x="258" y="288" width="210" height="100" rx="6" class="st"/>
+  <text x="268" y="308" class="h">Model proposals</text>
+  <text x="268" y="327" class="s">point / box / mask / text prompt</text>
+  <text x="268" y="344" class="s">-&gt; job -&gt; proposal overlay</text>
+  <text x="268" y="361" class="s">accept / add to selected / reject</text>
+  <text x="268" y="378" class="s">(provenance: backend, checkpoint)</text>
+  <rect x="480" y="288" width="210" height="100" rx="6" class="st"/>
+  <text x="490" y="308" class="h">Structural edits</text>
+  <text x="490" y="327" class="s">merge, split, duplicate, delete</text>
+  <text x="490" y="344" class="s">z-order drag, Subtract by Order</text>
+  <text x="490" y="361" class="s">class / visibility / lock changes</text>
+  <text x="490" y="378" class="s">undo / redo (snapshot restore)</text>
+  <rect x="702" y="288" width="210" height="100" rx="6" class="st"/>
+  <text x="712" y="308" class="h">Channel switching</text>
+  <text x="712" y="327" class="s">1-9 / 0, Tab, navigator</text>
+  <text x="712" y="344" class="s">only the displayed image changes;</text>
+  <text x="712" y="361" class="s">SAM sees the displayed channel</text>
+  <text x="712" y="378" class="s">(same percentile stretch)</text>
+  <rect x="924" y="288" width="232" height="100" rx="6" class="st" fill="#fdfdf3"/>
+  <text x="934" y="308" class="h">Every edit</text>
+  <text x="934" y="327" class="s">optimistic revision check</text>
+  <text x="934" y="344" class="s">regions.json + dataset.json</text>
+  <text x="934" y="361" class="s">written atomically, revision + 1,</text>
+  <text x="934" y="378" class="s">audit event, validation -&gt; stale</text>
+  <text x="46" y="420" class="s">Autosave: each operation is one API call; the header shows Saved / Saving...; Ctrl+Z / Ctrl+Y undo and redo every edit.</text>
+
+  <path d="M600,440 L600,478" class="ln"/>
+
+  <!-- 5 findings -->
+  <rect x="30" y="480" width="360" height="160" rx="8" class="st" fill="#fff5e6"/>
+  <text x="44" y="502" class="h">5  Findings (computed live)</text>
+  <text x="44" y="522" class="s">compose regions (visible, enabled class) by z-order</text>
+  <text x="44" y="540" class="s">overlap groups (4-connected, id = digest of</text>
+  <text x="44" y="557" class="s">participants + pixel set), missing coverage,</text>
+  <text x="44" y="574" class="s">hidden regions, class / Boundary policy problems,</text>
+  <text x="44" y="591" class="s">lossy imports, corrected model proposals</text>
+  <text x="44" y="612" class="s">severity: blocking / warning; review state</text>
+  <text x="44" y="629" class="s">for overlaps (unreviewed, resolved, intentional)</text>
+
+  <rect x="420" y="480" width="360" height="160" rx="8" class="st" fill="#fff5e6"/>
+  <text x="434" y="502" class="h">6  Review and resolve</text>
+  <text x="434" y="522" class="s">review only changes review state (R, Mark All</text>
+  <text x="434" y="540" class="s">Visible Reviewed); geometry untouched</text>
+  <text x="434" y="557" class="s">or resolve geometrically: z-order, Subtract by</text>
+  <text x="434" y="574" class="s">Order, eraser; fill missing pixels (fill tool,</text>
+  <text x="434" y="591" class="s">Boundary fill when the policy allows it)</text>
+  <text x="434" y="612" class="s">changed overlap pixels -&gt; new group id -&gt;</text>
+  <text x="434" y="629" class="s">review is pruned, overlap unreviewed again</text>
+
+  <rect x="810" y="480" width="360" height="160" rx="8" class="st" fill="#fff5e6"/>
+  <text x="824" y="502" class="h">7  Validate (Ctrl+Enter)</text>
+  <text x="824" y="522" class="s">blocking: unreviewed overlaps (if review</text>
+  <text x="824" y="540" class="s">required), unlabelled pixels, hidden regions,</text>
+  <text x="824" y="557" class="s">invalid / disabled classes, source problems,</text>
+  <text x="824" y="574" class="s">Boundary policy, exactly-one-class invariant</text>
+  <text x="824" y="595" class="s">stores validation/latest.json with</text>
+  <text x="824" y="612" class="s">status, dataset revision and</text>
+  <text x="824" y="629" class="m">composition_sha256 (int32 LE label map)</text>
+
+  <path d="M390,560 L418,560" class="ln"/>
+  <path d="M780,560 L808,560" class="ln"/>
+  <path d="M840,640 L840,668 L14,668 L14,345 L28,345" class="dash"/>
+  <text x="300" y="662" class="s" fill="#b03030">blocked: fix in the workspace and validate again (any later edit makes a stored report stale)</text>
+
+  <path d="M990,640 L990,688" class="ln"/>
+
+  <!-- 8 export gate -->
+  <rect x="680" y="690" width="490" height="190" rx="8" class="st" fill="#f4eefa"/>
+  <text x="694" y="712" class="h">8  Export (project page, derived data only)</text>
+  <text x="694" y="732" class="s">gate per dataset: report exists, status valid, report revision ==</text>
+  <text x="694" y="749" class="s">dataset revision == validated_revision, recomposed SHA-256 ==</text>
+  <text x="694" y="766" class="s">stored hash, no 0 pixel; otherwise listed as skipped with a code</text>
+  <text x="694" y="788" class="s">class id -&gt; export id; instance ids in z-order; Boundary policy</text>
+  <text x="694" y="805" class="s">(class | zero); profile writes files; manifest.json + classes.json</text>
+  <text x="694" y="822" class="s">ZIP package, SHA-256 + size recorded in exports/&lt;exp_id&gt;/export.json</text>
+  <text x="694" y="839" class="s">and in the project export history; audit event export.create</text>
+  <text x="694" y="864" class="m">NanoUNet: &lt;Channel&gt;/&lt;stem&gt;.png, Masks_instance/&lt;stem&gt;.tif</text>
+
+  <rect x="30" y="690" width="610" height="190" rx="8" class="st" fill="#f7f7f7"/>
+  <text x="44" y="712" class="h">Outputs and traceability</text>
+  <text x="44" y="734" class="s">Machine mask: uint16, one scalar per pixel (class export id or instance id)</text>
+  <text x="44" y="752" class="s">Colour mask: RGB PNG from the same composition with the exact class colours</text>
+  <text x="44" y="770" class="s">Manifest: per dataset pairing key, original filenames, export stem, written files,</text>
+  <text x="44" y="788" class="s">SHA-256 of every source channel, class histogram, overlap review summary,</text>
+  <text x="44" y="806" class="s">provenance summary (region sources, model backends, importers), warnings</text>
+  <text x="44" y="828" class="s">Native exact profile additionally: final_mask, instance_mask, untouched source</text>
+  <text x="44" y="846" class="s">copies, regions.json, validation.json, dataset.json with per-file SHA-256</text>
+  <text x="44" y="868" class="s">Audit log (logs/events.jsonl) links every revision to operation, actor and provenance</text>
+  <path d="M678,785 L642,785" class="ln"/>
+</svg>

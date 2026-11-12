@@ -5,11 +5,13 @@ pages.
 
 It covers what the project documentation uses: ATX headings (with
 GitHub-style anchor ids), paragraphs, fenced code blocks, inline code,
-emphasis, links, images (dropped to their alt text), ordered/unordered
-lists (one nesting level), pipe tables, block quotes and horizontal rules.
-Everything is HTML-escaped first, so documentation content can never
-inject markup. Links to other ``*.md`` documents are rewritten to the
-local ``/help/<name>`` routes so the Help stays self-contained.
+emphasis, links, images, ordered/unordered lists (one nesting level), pipe
+tables, block quotes and horizontal rules. Everything is HTML-escaped
+first, so documentation content can never inject markup. Links to other
+``*.md`` documents are rewritten to the local ``/help/<name>`` routes and
+raster images in ``docs/images/`` to ``/help/images/<file>``, so the Help
+stays self-contained; any other image (remote, SVG, outside ``images/``)
+is replaced by its alt text.
 """
 
 from __future__ import annotations
@@ -24,7 +26,13 @@ _UL = re.compile(r"^(\s*)[-*+]\s+(.*)$")
 _OL = re.compile(r"^(\s*)\d+[.)]\s+(.*)$")
 _TABLE_SEP = re.compile(r"^\s*\|?\s*:?-{2,}:?\s*(\|\s*:?-{2,}:?\s*)*\|?\s*$")
 _LINK = re.compile(r"\[([^\]]+)\]\(([^)\s]+)\)")
-_IMAGE = re.compile(r"!\[([^\]]*)\]\([^)]*\)")
+_IMAGE = re.compile(r"!\[([^\]]*)\]\(([^)\s]*)\)")
+#: File names the Help serves from ``docs/images`` (``/help/images/<file>``).
+IMAGE_FILE = re.compile(
+    r"^[A-Za-z0-9][A-Za-z0-9_.-]{0,120}\.(?:png|jpe?g|gif|webp)$", re.IGNORECASE
+)
+_LOCAL_IMAGE = re.compile(r"^(?:\./)?images/([^/]+)$")
+_PLACEHOLDER = re.compile("\x00(\\d+)\x00")
 _CODE = re.compile(r"`([^`]+)`")
 _BOLD = re.compile(r"\*\*(.+?)\*\*")
 _ITALIC = re.compile(
@@ -52,9 +60,33 @@ def rewrite_link(target: str) -> str:
     return target
 
 
+def image_src(target: str) -> str | None:
+    """``/help/images/<file>`` for a raster image in ``docs/images``, else None."""
+    match = _LOCAL_IMAGE.match(target)
+    if match and IMAGE_FILE.match(match.group(1)):
+        return f"/help/images/{match.group(1)}"
+    return None
+
+
 def render_inline(text: str) -> str:
-    escaped = html.escape(text, quote=False)
-    escaped = _IMAGE.sub(lambda m: html.escape(m.group(1)), escaped)
+    # Images become placeholders first, so neither the alt text nor the file
+    # name is touched by the code/link/emphasis rules below.
+    images: list[str] = []
+
+    def image(match: re.Match[str]) -> str:
+        alt = html.unescape(match.group(1))
+        src = image_src(html.unescape(match.group(2)))
+        if src is None:
+            images.append(html.escape(alt, quote=False))
+        else:
+            images.append(
+                f'<img src="{html.escape(src, quote=True)}" alt="{html.escape(alt, quote=True)}"'
+                ' loading="lazy" />'
+            )
+        return f"\x00{len(images) - 1}\x00"
+
+    escaped = html.escape(text.replace("\x00", ""), quote=False)
+    escaped = _IMAGE.sub(image, escaped)
     escaped = _CODE.sub(lambda m: f"<code>{m.group(1)}</code>", escaped)
 
     def link(match: re.Match[str]) -> str:
@@ -67,7 +99,7 @@ def render_inline(text: str) -> str:
     escaped = _LINK.sub(link, escaped)
     escaped = _BOLD.sub(lambda m: f"<strong>{m.group(1)}</strong>", escaped)
     escaped = _ITALIC.sub(lambda m: f"<em>{m.group(1) or m.group(2)}</em>", escaped)
-    return escaped
+    return _PLACEHOLDER.sub(lambda m: images[int(m.group(1))], escaped)
 
 
 @dataclass
@@ -99,7 +131,11 @@ def render_markdown(source: str) -> Rendered:
     def flush_paragraph() -> None:
         nonlocal paragraph
         if paragraph:
-            out.append(f"<p>{render_inline(' '.join(paragraph))}</p>")
+            text = " ".join(paragraph)
+            # A paragraph holding only images is a figure; its caption follows.
+            figure = _IMAGE.search(text) is not None and not _IMAGE.sub("", text).strip()
+            css = ' class="lv-help-figure"' if figure else ""
+            out.append(f"<p{css}>{render_inline(text)}</p>")
             paragraph = []
 
     def close_lists(to_indent: int = -1) -> None:

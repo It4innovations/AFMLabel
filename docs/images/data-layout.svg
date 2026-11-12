@@ -1,0 +1,92 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="760" viewBox="0 0 1200 760" font-family="Arial, Helvetica, sans-serif" font-size="13">
+  <title>AFMLabel on-disk workspace layout</title>
+  <defs>
+    <style>
+      .m{font-family:Consolas, 'Courier New', monospace;font-size:13px;fill:#111}
+      .d{font-family:Consolas, 'Courier New', monospace;font-size:13px;fill:#1f4e86;font-weight:bold}
+      .c{font-size:12px;fill:#555}
+      .v{font-size:11px;fill:#ffffff;font-weight:bold}
+      .tree{stroke:#999;stroke-width:1;fill:none}
+      .h{font-weight:bold;font-size:14px}
+    </style>
+  </defs>
+  <rect width="1200" height="760" fill="#ffffff"/>
+  <text x="600" y="30" text-anchor="middle" font-weight="bold" font-size="18">On-disk layout of the workspace (all paths derived in persistence/paths.py)</text>
+
+  <!-- legend -->
+  <rect x="860" y="48" width="320" height="104" rx="6" fill="#f7f7f7" stroke="#bbb"/>
+  <text x="872" y="68" class="h">Legend</text>
+  <rect x="872" y="78" width="42" height="16" rx="3" fill="#2e7d32"/><text x="893" y="90" text-anchor="middle" class="v">v2</text>
+  <text x="922" y="90" class="c">JSON with schema_version (migrated on read)</text>
+  <rect x="872" y="100" width="42" height="16" rx="3" fill="#c98a2b"/><text x="893" y="112" text-anchor="middle" class="v">atomic</text>
+  <text x="922" y="112" class="c">temp file + fsync + os.replace</text>
+  <rect x="872" y="122" width="42" height="16" rx="3" fill="#7a52a8"/><text x="893" y="134" text-anchor="middle" class="v">append</text>
+  <text x="922" y="134" class="c">append-only JSON Lines</text>
+
+  <g transform="translate(40,60)">
+    <text x="0" y="0" class="d">&lt;workspace.root&gt;/</text>
+    <path d="M10,6 V646" class="tree"/>
+
+    <path d="M10,26 H24" class="tree"/><text x="28" y="30" class="d">auth/</text>
+    <path d="M38,36 V74" class="tree"/>
+    <path d="M38,52 H52" class="tree"/><text x="56" y="56" class="m">account.json</text>
+    <rect x="200" y="43" width="42" height="16" rx="3" fill="#c98a2b"/><text x="221" y="55" text-anchor="middle" class="v">atomic</text>
+    <text x="252" y="56" class="c">single account: username, Argon2id hash (never plaintext)</text>
+    <path d="M38,74 H52" class="tree"/><text x="56" y="78" class="m">sessions.json</text>
+    <rect x="200" y="65" width="42" height="16" rx="3" fill="#2e7d32"/><text x="221" y="77" text-anchor="middle" class="v">v1</text>
+    <text x="252" y="78" class="c">SHA-256 of session tokens + expiry (sessions survive restarts)</text>
+
+    <path d="M10,104 H24" class="tree"/><text x="28" y="108" class="d">projects/&lt;proj_id&gt;/</text>
+    <path d="M38,114 V578" class="tree"/>
+    <path d="M38,132 H52" class="tree"/><text x="56" y="136" class="m">project.json</text>
+    <rect x="200" y="123" width="42" height="16" rx="3" fill="#2e7d32"/><text x="221" y="135" text-anchor="middle" class="v">v2</text>
+    <text x="252" y="136" class="c">name, revision, config overrides, channels[], dataset_order, import/export history</text>
+    <path d="M38,154 H52" class="tree"/><text x="56" y="158" class="m">classes.json</text>
+    <rect x="200" y="145" width="42" height="16" rx="3" fill="#2e7d32"/><text x="221" y="157" text-anchor="middle" class="v">v1</text>
+    <text x="252" y="158" class="c">class ontology (written before project.json in one mutation)</text>
+    <path d="M38,176 H52" class="tree"/><text x="56" y="180" class="m">ui_state.json</text>
+    <text x="252" y="180" class="c">browser resume state (last dataset, channel, tool, zoom); last writer wins</text>
+
+    <path d="M38,204 H52" class="tree"/><text x="56" y="208" class="d">datasets/&lt;ds_id&gt;/</text>
+    <path d="M66,214 V420" class="tree"/>
+    <path d="M66,232 H80" class="tree"/><text x="84" y="236" class="m">dataset.json</text>
+    <rect x="240" y="223" width="42" height="16" rx="3" fill="#2e7d32"/><text x="261" y="235" text-anchor="middle" class="v">v2</text>
+    <text x="292" y="236" class="c">channels[] (SourceImage: original filename, SHA-256, size, dtype, calibration),</text>
+    <text x="292" y="252" class="c">width, height, revision, validated_revision, pairing key, replacements[]</text>
+    <path d="M66,276 H80" class="tree"/><text x="84" y="280" class="m">source/&lt;channel_key&gt;.&lt;ext&gt;</text>
+    <text x="292" y="280" class="c">untouched uploaded file per channel (never modified)</text>
+    <path d="M66,302 H80" class="tree"/><text x="84" y="306" class="m">annotations/regions.json</text>
+    <rect x="292" y="293" width="42" height="16" rx="3" fill="#2e7d32"/><text x="313" y="305" text-anchor="middle" class="v">v1</text>
+    <text x="344" y="306" class="c">RegionSet: regions[] with COCO RLE masks, overlap_reviews, next_region_seq</text>
+    <path d="M66,328 H80" class="tree"/><text x="84" y="332" class="m">validation/latest.json</text>
+    <rect x="292" y="319" width="42" height="16" rx="3" fill="#2e7d32"/><text x="313" y="331" text-anchor="middle" class="v">v1</text>
+    <text x="344" y="332" class="c">ValidationReport: status, blocking/warnings, coverage, composition_sha256</text>
+    <path d="M66,354 H80" class="tree"/><text x="84" y="358" class="m">jobs/&lt;job_id&gt;.json</text>
+    <text x="292" y="358" class="c">inference job records (status, prompts, proposals); interrupted jobs marked failed on start</text>
+    <path d="M66,380 H80" class="tree"/><text x="84" y="384" class="m">cache/display, cache/thumbnails</text>
+    <text x="344" y="384" class="c">derived 8-bit PNG renders (disposable)</text>
+    <path d="M66,406 H80" class="tree"/><text x="84" y="410" class="m">imports/</text>
+    <text x="292" y="410" class="c">reserved (created empty, like annotations/masks/); new datasets are built in .staging-&lt;ds_id&gt; and renamed</text>
+
+    <path d="M38,440 H52" class="tree"/><text x="56" y="444" class="d">logs/</text><text x="110" y="444" class="m">events.jsonl</text>
+    <rect x="240" y="431" width="42" height="16" rx="3" fill="#7a52a8"/><text x="261" y="443" text-anchor="middle" class="v">append</text>
+    <text x="292" y="444" class="c">audit events: id, timestamp, operation, dataset, regions, classes, previous/new revision,</text>
+    <text x="292" y="460" class="c">source (manual, sam_proposal, tswat_import, ...), actor, provenance, details</text>
+
+    <path d="M38,484 H52" class="tree"/><text x="56" y="488" class="d">exports/&lt;exp_id&gt;/</text>
+    <path d="M66,494 V538" class="tree"/>
+    <path d="M66,512 H80" class="tree"/><text x="84" y="516" class="m">export.json</text>
+    <text x="292" y="516" class="c">ExportRecord: profile, options, datasets[], skipped[], package SHA-256 and size, class mapping</text>
+    <path d="M66,538 H80" class="tree"/><text x="84" y="542" class="m">afmlabel-&lt;profile&gt;-&lt;exp_id&gt;.zip</text>
+    <text x="344" y="542" class="c">the downloadable package (manifest.json + classes.json inside)</text>
+
+    <path d="M38,578 H52" class="tree"/><text x="56" y="582" class="d">locks/</text><text x="116" y="582" class="m">project.lock</text>
+    <text x="292" y="582" class="c">editing lock (O_EXCL create, heartbeat, stale after 90 s, explicit takeover audited)</text>
+
+    <path d="M10,616 H24" class="tree"/><text x="28" y="620" class="d">trash/</text>
+    <text x="292" y="620" class="c">deleted projects / datasets moved here with a timestamp (recoverable)</text>
+    <path d="M10,646 H24" class="tree"/><text x="28" y="650" class="d">tmp/uploads/</text>
+    <text x="292" y="650" class="c">upload batches (&lt;name&gt;.part renamed when complete), tswat/, lossy/, replacements/ staging</text>
+  </g>
+  <text x="40" y="740" class="c">Model checkpoints are not part of the workspace: ./models/&lt;id&gt;/ (configurable checkpoint_dir) holds the files and the manifest.json written by scripts/download_models.py.</text>
+</svg>

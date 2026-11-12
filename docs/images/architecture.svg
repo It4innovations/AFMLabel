@@ -1,0 +1,153 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="860" viewBox="0 0 1200 860" font-family="Arial, Helvetica, sans-serif" font-size="13">
+  <title>AFMLabel system architecture</title>
+  <defs>
+    <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#444"/>
+    </marker>
+    <style>
+      .box{fill:#ffffff;stroke:#555;stroke-width:1.2}
+      .tier{stroke-width:1.5;rx:10}
+      .t{font-weight:bold;font-size:15px}
+      .h{font-weight:bold;font-size:13px}
+      .s{font-size:12px;fill:#333}
+      .m{font-family:Consolas, 'Courier New', monospace;font-size:11.5px;fill:#222}
+      .ln{stroke:#444;stroke-width:1.4;fill:none;marker-end:url(#arr)}
+      .ln2{stroke:#444;stroke-width:1.4;fill:none;marker-end:url(#arr);marker-start:url(#arr)}
+      .dash{stroke:#888;stroke-width:1.3;fill:none;stroke-dasharray:6 4;marker-end:url(#arr)}
+    </style>
+  </defs>
+  <rect width="1200" height="860" fill="#ffffff"/>
+  <text x="600" y="30" text-anchor="middle" class="t" font-size="18">AFMLabel 1.0.0 - system architecture (single host, no runtime network access)</text>
+
+  <!-- Browser tier -->
+  <rect x="20" y="50" width="1160" height="120" class="tier" fill="#eaf2fb" stroke="#4a7ab5"/>
+  <text x="36" y="74" class="t" fill="#1f4e86">Browser UI (Chrome / Firefox) - server-rendered Jinja2 pages + plain ES modules, no CDN, no build step</text>
+  <rect x="36" y="88" width="170" height="68" class="box" rx="6"/>
+  <text x="121" y="108" text-anchor="middle" class="h">Pages</text>
+  <text x="121" y="126" text-anchor="middle" class="m">login, projects,</text>
+  <text x="121" y="142" text-anchor="middle" class="m">project, workspace, help</text>
+  <rect x="216" y="88" width="250" height="68" class="box" rx="6"/>
+  <text x="341" y="108" text-anchor="middle" class="h">Annotation workspace</text>
+  <text x="341" y="126" text-anchor="middle" class="m">workspace.js, annotation-canvas.js,</text>
+  <text x="341" y="142" text-anchor="middle" class="m">masks.js (brush, polygon, fill)</text>
+  <rect x="476" y="88" width="220" height="68" class="box" rx="6"/>
+  <text x="586" y="108" text-anchor="middle" class="h">Panels</text>
+  <text x="586" y="126" text-anchor="middle" class="m">regions-panel.js, findings.js,</text>
+  <text x="586" y="142" text-anchor="middle" class="m">segmentation.js, status-bar.js</text>
+  <rect x="706" y="88" width="220" height="68" class="box" rx="6"/>
+  <text x="816" y="108" text-anchor="middle" class="h">Project page dialogs</text>
+  <text x="816" y="126" text-anchor="middle" class="m">datasets.js, exports.js,</text>
+  <text x="816" y="142" text-anchor="middle" class="m">legacy-import.js, project.js</text>
+  <rect x="936" y="88" width="230" height="68" class="box" rx="6"/>
+  <text x="1051" y="108" text-anchor="middle" class="h">Shared</text>
+  <text x="1051" y="126" text-anchor="middle" class="m">api.js (fetch + CSRF header),</text>
+  <text x="1051" y="142" text-anchor="middle" class="m">lock.js, help.js, theme.js</text>
+
+  <!-- HTTP link -->
+  <path d="M600,172 L600,212" class="ln2"/>
+  <text x="612" y="189" class="s">HTTP/JSON, default 127.0.0.1:9080 (SSH tunnel or TLS reverse proxy for remote use)</text>
+  <text x="612" y="205" class="s">opaque session cookie (HttpOnly, SameSite=Lax); X-Requested-With: AFMLabel on writes</text>
+
+  <!-- Server tier -->
+  <rect x="20" y="216" width="1160" height="420" class="tier" fill="#eef7ee" stroke="#4b8b4b"/>
+  <text x="36" y="240" class="t" fill="#2d6a2d">FastAPI application (afmlabel.main:create_app) served by Uvicorn - Python 3.12 / 3.13</text>
+
+  <rect x="36" y="254" width="1128" height="40" class="box" rx="6" fill="#fdfdf3"/>
+  <text x="48" y="279" class="h">AuthMiddleware</text>
+  <text x="170" y="279" class="s">session check (401 JSON for API, redirect to /login or /setup for pages) - CSRF: header + same-origin check on POST/PUT/PATCH/DELETE - error envelope handlers</text>
+
+  <rect x="36" y="304" width="1128" height="62" class="box" rx="6"/>
+  <text x="48" y="324" class="h">API routers (afmlabel.api, /api/v1)</text>
+  <text x="48" y="344" class="m">auth | projects (classes, channels, lock, events, ui-state) | datasets (batches, images, replace-source) | regions | validation (findings, overlaps, validate,</text>
+  <text x="48" y="359" class="m">boundary-fill) | imports (TSWAT/CVAT XML, lossy mask) | segmentation (segment, jobs) | exports | health (health, version, resources, models) | help | pages</text>
+
+  <!-- services row -->
+  <text x="48" y="390" class="h">Service layer (app.state singletons)</text>
+  <rect x="36" y="398" width="178" height="74" class="box" rx="6"/>
+  <text x="125" y="418" text-anchor="middle" class="h">ProjectStore</text>
+  <text x="125" y="436" text-anchor="middle" class="s">projects, classes,</text>
+  <text x="125" y="452" text-anchor="middle" class="s">locks, audit events</text>
+  <rect x="222" y="398" width="178" height="74" class="box" rx="6"/>
+  <text x="311" y="418" text-anchor="middle" class="h">DatasetStore / BatchStore</text>
+  <text x="311" y="436" text-anchor="middle" class="s">upload batches, pairing,</text>
+  <text x="311" y="452" text-anchor="middle" class="s">sources, display cache</text>
+  <rect x="408" y="398" width="178" height="74" class="box" rx="6"/>
+  <text x="497" y="418" text-anchor="middle" class="h">RegionService</text>
+  <text x="497" y="436" text-anchor="middle" class="s">revisioned region edits,</text>
+  <text x="497" y="452" text-anchor="middle" class="s">merge/split/subtract/restore</text>
+  <rect x="594" y="398" width="178" height="74" class="box" rx="6"/>
+  <text x="683" y="418" text-anchor="middle" class="h">ValidationService</text>
+  <text x="683" y="436" text-anchor="middle" class="s">overlap engine, findings,</text>
+  <text x="683" y="452" text-anchor="middle" class="s">validate, boundary fill</text>
+  <rect x="780" y="398" width="178" height="74" class="box" rx="6"/>
+  <text x="869" y="418" text-anchor="middle" class="h">ExportService</text>
+  <text x="869" y="436" text-anchor="middle" class="s">validation gate, profiles</text>
+  <text x="869" y="452" text-anchor="middle" class="s">NanoUNet / native exact, ZIP</text>
+  <rect x="966" y="398" width="198" height="74" class="box" rx="6"/>
+  <text x="1065" y="418" text-anchor="middle" class="h">TswatImportService</text>
+  <text x="1065" y="436" text-anchor="middle" class="s">CVAT 1.1 XML stage/commit;</text>
+  <text x="1065" y="452" text-anchor="middle" class="s">lossy raster import</text>
+
+  <rect x="36" y="486" width="300" height="74" class="box" rx="6"/>
+  <text x="186" y="506" text-anchor="middle" class="h">JobManager</text>
+  <text x="186" y="524" text-anchor="middle" class="s">bounded queue, worker thread(s), cancellation,</text>
+  <text x="186" y="540" text-anchor="middle" class="s">typed errors (MODEL_OOM), persisted job records</text>
+  <rect x="346" y="486" width="300" height="74" class="box" rx="6"/>
+  <text x="496" y="506" text-anchor="middle" class="h">BackendRegistry</text>
+  <text x="496" y="524" text-anchor="middle" class="s">lists every backend with load_state and exact</text>
+  <text x="496" y="540" text-anchor="middle" class="s">unavailable reason; explicit background load</text>
+  <rect x="656" y="486" width="250" height="74" class="box" rx="6"/>
+  <text x="781" y="506" text-anchor="middle" class="h">ResourceMonitor / diagnostics</text>
+  <text x="781" y="524" text-anchor="middle" class="s">CPU, RAM, disk, GPU (nvidia-smi),</text>
+  <text x="781" y="540" text-anchor="middle" class="s">health checks, privacy scan</text>
+  <rect x="916" y="486" width="248" height="74" class="box" rx="6"/>
+  <text x="1040" y="506" text-anchor="middle" class="h">Cross-cutting</text>
+  <text x="1040" y="524" text-anchor="middle" class="s">settings (YAML + env), JSON logging</text>
+  <text x="1040" y="540" text-anchor="middle" class="s">with secret redaction, help renderer</text>
+
+  <rect x="36" y="572" width="1128" height="52" class="box" rx="6" fill="#f7f7f7"/>
+  <text x="48" y="592" class="h">Domain + persistence</text>
+  <text x="48" y="612" class="m">domain/* Pydantic models (schema_version) | persistence: atomic.py (temp file + fsync + os.replace), jsonl.py (append-only), migrations.py, locks.py, rle.py (COCO RLE)</text>
+
+  <path d="M600,294 L600,304" class="ln"/>
+  <path d="M600,366 L600,396" class="ln"/>
+    <path d="M336,523 L344,523" class="ln"/>
+
+  <!-- Bottom: filesystem and models -->
+  <rect x="20" y="660" width="560" height="180" class="tier" fill="#fff5e6" stroke="#c98a2b"/>
+  <text x="36" y="684" class="t" fill="#8a5a12">Filesystem workspace (workspace.root)</text>
+  <text x="36" y="706" class="m">auth/account.json, auth/sessions.json</text>
+  <text x="36" y="724" class="m">projects/&lt;proj_id&gt;/project.json, classes.json, ui_state.json</text>
+  <text x="56" y="742" class="m">datasets/&lt;ds_id&gt;/dataset.json, source/, annotations/regions.json,</text>
+  <text x="76" y="760" class="m">validation/latest.json, jobs/, cache/</text>
+  <text x="56" y="778" class="m">logs/events.jsonl (audit), exports/&lt;exp_id&gt;/, locks/project.lock</text>
+  <text x="36" y="796" class="m">trash/ (recoverable deletes), tmp/uploads/ (staging)</text>
+  <text x="36" y="822" class="s">No database server; backup = copy the directory while nobody edits.</text>
+
+  <rect x="600" y="660" width="580" height="180" class="tier" fill="#f4eefa" stroke="#7a52a8"/>
+  <text x="616" y="684" class="t" fill="#55307f">Segmentation backends (SegmentationBackend protocol)</text>
+  <rect x="616" y="696" width="128" height="66" class="box" rx="6"/>
+  <text x="680" y="716" text-anchor="middle" class="h">fake</text>
+  <text x="680" y="734" text-anchor="middle" class="s">deterministic,</text>
+  <text x="680" y="750" text-anchor="middle" class="s">CPU, always on</text>
+  <rect x="752" y="696" width="128" height="66" class="box" rx="6"/>
+  <text x="816" y="716" text-anchor="middle" class="h">sam3</text>
+  <text x="816" y="734" text-anchor="middle" class="s">SAM 3 image,</text>
+  <text x="816" y="750" text-anchor="middle" class="s">CUDA or CPU</text>
+  <rect x="888" y="696" width="128" height="66" class="box" rx="6"/>
+  <text x="952" y="716" text-anchor="middle" class="h">sam31</text>
+  <text x="952" y="734" text-anchor="middle" class="s">SAM 3.1 multiplex,</text>
+  <text x="952" y="750" text-anchor="middle" class="s">CUDA only</text>
+  <rect x="1024" y="696" width="140" height="66" class="box" rx="6"/>
+  <text x="1094" y="716" text-anchor="middle" class="h">sam21</text>
+  <text x="1094" y="734" text-anchor="middle" class="s">SAM 2.1 (transformers),</text>
+  <text x="1094" y="750" text-anchor="middle" class="s">CUDA or CPU</text>
+  <text x="616" y="786" class="s">Optional extra "sam" (torch, transformers); checkpoints in ./models/&lt;id&gt;</text>
+  <text x="616" y="804" class="s">verified against manifest.json (pinned revision, SHA-256). Disabled by default.</text>
+  <text x="616" y="826" class="s">Checkpoints obtained only by scripts/download_models.py (administrator, not at runtime).</text>
+
+  <path d="M300,624 L300,658" class="ln2"/>
+  <path d="M880,636 L880,658" class="ln"/>
+  <text x="890" y="652" class="s">inference (JobManager worker thread)</text>
+
+</svg>

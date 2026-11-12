@@ -136,3 +136,30 @@ def test_upload_and_preview_pairing_is_an_obvious_button_in_both_themes(
     expect(page.locator("#import-error")).to_contain_text(
         "Select files for the channels first."
     )
+
+
+def test_help_user_guide_shows_its_screenshots(logged_in_page: Page, live_server_url: str) -> None:
+    page = logged_in_page
+    page.goto(f"{live_server_url}/help/user-guide")
+    figures = page.locator("#help-article p.lv-help-figure img")
+    expect(figures.first).to_be_visible()
+    assert figures.count() >= 10
+    # Every image loads from the local Help route; none is broken.
+    page.evaluate(
+        "Promise.all([...document.querySelectorAll('#help-article img')]"
+        ".map((img) => { img.loading = 'eager'; return img.decode(); }))"
+    )
+    broken = page.evaluate(
+        "[...document.querySelectorAll('#help-article img')]"
+        ".filter((img) => !img.complete || img.naturalWidth === 0).map((img) => img.src)"
+    )
+    assert broken == []
+    sources = figures.evaluate_all("(imgs) => imgs.map((img) => img.getAttribute('src'))")
+    assert all(src.startswith("/help/images/") for src in sources), sources
+    # The figure never overflows the article column.
+    widths = page.evaluate(
+        "(() => { const a = document.getElementById('help-article').clientWidth;"
+        " const img = document.querySelector('#help-article img').getBoundingClientRect().width;"
+        " return [a, img]; })()"
+    )
+    assert widths[1] <= widths[0]

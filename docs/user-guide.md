@@ -15,12 +15,20 @@ actions for the extended text, and use **Help** in the header to open this
 guide inside the application. Nothing in the Help needs a network
 connection; the application never contacts the network at runtime.
 
+![The built-in Help page renders this guide offline inside the application](images/ui-15-help.png)
+
+*The built-in Help page renders this guide offline inside the application.*
+
 ## Start and sign in
 
 Open the AFMLabel URL (by default `http://127.0.0.1:9080`) and sign in with
 the single application account created by the administrator
 (`afmlabel auth set-password`). Sessions expire after a period of
 inactivity; you are simply asked to sign in again.
+
+![Sign-in page (single local account)](images/ui-01-login.png)
+
+*Sign-in page (single local account).*
 
 ## Create or open a project
 
@@ -30,6 +38,14 @@ topography + friction pair; choose the number your instrument exports
 (1 to 64). A project holds one class ontology, one set of channel
 definitions and any number of datasets. The search box filters projects by
 name; **Open** goes to the project page.
+
+![Projects page with one project](images/ui-02-projects.png)
+
+*Projects page with one project.*
+
+![Create project dialog with the number of images per dataset (channels)](images/ui-02b-create-project.png)
+
+*Create project dialog with the number of images per dataset (channels).*
 
 ### Channels
 
@@ -63,6 +79,18 @@ When another session holds the lock you can take it over (that session
 becomes read-only) or open the project read-only yourself. Read-only tabs
 can look at everything but change nothing.
 
+### Audit log
+
+Every change to a project or its datasets is appended to the project's
+audit log (`logs/events.jsonl`). The collapsible **Audit log** section at
+the bottom of the project page lists the latest 100 events, newest first:
+timestamp, operation, the new revision where the operation created one,
+and the actor (`username@session`). **Refresh** reloads the list.
+
+![Audit log on the project page: one line per event with timestamp, operation, new revision and actor](images/ui-16-audit-log.png)
+
+*Audit log on the project page: one line per event with timestamp, operation, new revision and actor.*
+
 ## Classes
 
 On the project page add the classes you will annotate: name, colour and
@@ -81,6 +109,10 @@ Rules:
 
 The **Classes** tab of the workspace can add a class quickly; the project
 page edits colours, roles and export ids.
+
+![Project page: Channels table (channel 3 renamed to Phase with tokens "phase, ph") and Classes table, before the first import](images/ui-03-project-channels-classes.png)
+
+*Project page: Channels table (channel 3 renamed to Phase with tokens "phase, ph") and Classes table, before the first import.*
 
 ## Import images
 
@@ -110,6 +142,14 @@ nothing is ever resampled.
 
 Dataset cards show the thumbnails of the first four channels (a `+N` badge
 counts the rest), the original filenames and the region count.
+
+![Import dialog: all nine files chosen in the "All channels at once" picker and the pairing preview with one row per dataset](images/ui-04-import-pairing-preview.png)
+
+*Import dialog: all nine files chosen in the "All channels at once" picker and the pairing preview with one row per dataset.*
+
+![Dataset cards after the commit (thumbnails of the channels, original filenames)](images/ui-05-project-datasets.png)
+
+*Dataset cards after the commit (thumbnails of the channels, original filenames).*
 
 ### Replace a source image
 
@@ -143,6 +183,10 @@ class under the canvas, a status bar (coverage, missing pixels, overlaps,
 validation, host resources) and a right-hand panel with the **Regions**,
 **Classes** and **Findings** tabs plus the **View** block.
 
+![Annotation workspace: tool rail, canvas with regions (two Grain B polygons, a brushed Particle, an accepted fake proposal), Regions panel, View block and status bar](images/ui-06-workspace-regions.png)
+
+*Annotation workspace: tool rail, canvas with regions (two Grain B polygons, a brushed Particle, an accepted fake proposal), Regions panel, View block and status bar.*
+
 ### Switch channel
 
 All channels of a dataset are views of one field of view, so they share
@@ -161,6 +205,14 @@ Keyboard: `1`-`9` show channel 1-9 (`0` shows channel 10), `Tab` shows the
 next channel and `Shift+Tab` the previous one (both wrap around). Images
 are loaded on demand and cached, so a dataset with many channels opens as
 fast as a pair.
+
+![The same dataset and regions shown on the Friction channel](images/ui-07-channel-friction.png)
+
+*The same dataset and regions shown on the Friction channel.*
+
+![Channel navigator on channel 3 (Phase) of a three-channel dataset](images/ui-08-channel-phase.png)
+
+*Channel navigator on channel 3 (Phase) of a three-channel dataset.*
 
 ### Brightness and contrast (view-only)
 
@@ -380,6 +432,10 @@ Accepted regions record backend, checkpoint hash, code revision, prompts,
 channel and source checksum in their provenance; a region edited afterwards
 is reported as a corrected model proposal.
 
+![Proposal from the deterministic fake backend (synthetic geometry, used here only to demonstrate the workflow): prompt points, variant selector and Accept / Add to selected / Reject](images/ui-09-sam-proposal-fake.png)
+
+*Proposal from the deterministic fake backend (synthetic geometry, used here only to demonstrate the workflow): prompt points, variant selector and Accept / Add to selected / Reject.*
+
 ### Refining
 
 Tick **Refine selected region** (`sam3`, `sam21`) to send the selected
@@ -445,6 +501,10 @@ report that gates export; review changes review state only. A Finding that
 represents a still-invalid condition (missing coverage, hidden region,
 disabled class, policy violation) cannot be waived by review.
 
+![Findings tab: one blocking unreviewed overlap after the remaining area was filled with the fill tool](images/ui-10-findings.png)
+
+*Findings tab: one blocking unreviewed overlap after the remaining area was filled with the fill tool.*
+
 ### Reviewing overlaps
 
 Marking an overlap reviewed (**Mark Selected Reviewed**, `R`, **Mark All
@@ -462,6 +522,10 @@ regions, disabled or missing classes, source problems, Boundary policy)
 and stores the report together with the composition hash. A valid report
 at the current revision is what export requires. Any later edit makes it
 stale: the Findings panel shows a banner and the status bar says `stale`.
+
+![After Mark All Visible Reviewed and Validate: stored report VALID at the current revision, coverage 100 %](images/ui-11-validated.png)
+
+*After Mark All Visible Reviewed and Validate: stored report VALID at the current revision, coverage 100 %.*
 
 ### Boundary
 
@@ -484,6 +548,14 @@ filename preview shows how the original filenames become the exported
 names. Each export is a ZIP; its SHA-256 and size are recorded in the
 history with a download link. Export is derived data: it never changes
 the annotation.
+
+![Export dialog: NanoUNet profile, options, only the validated dataset ticked, filename preview](images/ui-12-export-dialog.png)
+
+*Export dialog: NanoUNet profile, options, only the validated dataset ticked, filename preview.*
+
+![Export created: status line and history entry with SHA-256 and download link](images/ui-13-export-done.png)
+
+*Export created: status line and history entry with SHA-256 and download link.*
 
 ### Validation requirement
 
@@ -552,6 +624,10 @@ stem of the export gets a zero-padded sequence prefix (`001_242_2`,
 `002_242_3`), recorded in the manifest. The manifest records, per dataset,
 the pairing key, the original filename of every channel, the export stem,
 every written file and the SHA-256 of every source image.
+
+![Contents of the exported NanoUNet package of the example dataset s101: channel PNGs, colour visualisation, mask values with pixel counts per class, and the file list](images/ui-14-export-result.png)
+
+*Contents of the exported NanoUNet package of the example dataset s101: channel PNGs, colour visualisation, mask values with pixel counts per class, and the file list.*
 
 ## Administration
 

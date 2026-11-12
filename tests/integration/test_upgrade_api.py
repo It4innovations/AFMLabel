@@ -576,6 +576,17 @@ def test_help_pages_and_registry_are_served_locally(api_client: TestClient) -> N
     assert "cdn." not in page.text and "https://" not in page.text.split("<article")[1].split(
         "</article>"
     )[0].replace("https://code.it4i.cz", "")
+    assert '<img src="/help/images/ui-01-login.png"' in page.text
+    image = api_client.get("/help/images/ui-01-login.png")
+    assert image.status_code == 200 and image.headers["content-type"] == "image/png"
+    assert image.content.startswith(b"\x89PNG")
+    for bad in (
+        "/help/images/missing.png",
+        "/help/images/architecture.svg",
+        "/help/images/..%2Fuser-guide.md",
+        "/help/images/%2E%2E%2F%2E%2E%2Fpyproject.toml",
+    ):
+        assert api_client.get(bad).status_code == 404, bad
     missing = api_client.get("/help/does-not-exist")
     assert missing.status_code == 404 and "Document not found" in missing.text
     assert api_client.get("/help/../etc/passwd").status_code in (404, 400)

@@ -1,0 +1,187 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="860" viewBox="0 0 1200 860" font-family="Arial, Helvetica, sans-serif" font-size="12">
+  <title>AFMLabel data model</title>
+  <defs>
+    <marker id="dia" viewBox="0 0 12 12" refX="1" refY="6" markerWidth="12" markerHeight="12" orient="auto">
+      <path d="M0,6 L6,1 L12,6 L6,11 z" fill="#444"/>
+    </marker>
+    <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto">
+      <path d="M0,0 L10,5 L0,10 z" fill="#444"/>
+    </marker>
+    <style>
+      .e{fill:#ffffff;stroke:#444;stroke-width:1.3}
+      .hd{stroke:#444;stroke-width:1.3}
+      .n{font-weight:bold;font-size:13px;fill:#ffffff}
+      .f{font-family:Consolas, 'Courier New', monospace;font-size:11.5px;fill:#222}
+      .c{stroke:#444;stroke-width:1.3;fill:none;marker-start:url(#dia)}
+      .r{stroke:#666;stroke-width:1.2;fill:none;stroke-dasharray:5 4;marker-end:url(#arr)}
+      .lb{font-size:11.5px;fill:#333}
+    </style>
+  </defs>
+  <rect width="1200" height="860" fill="#ffffff"/>
+  <text x="600" y="28" text-anchor="middle" font-weight="bold" font-size="18">Data model (Pydantic models in src/afmlabel/domain; diamond = containment, dashed = reference by id)</text>
+
+  <!-- Project -->
+  <rect x="30" y="50" width="300" height="214" class="e" rx="4"/>
+  <rect x="30" y="50" width="300" height="24" fill="#1f4e86" class="hd" rx="4"/>
+  <text x="40" y="67" class="n">Project  (project.json, schema v2)</text>
+  <text x="40" y="92" class="f">project_id: proj_&lt;hex&gt;</text>
+  <text x="40" y="108" class="f">name, created_at, modified_at</text>
+  <text x="40" y="124" class="f">revision: int (optimistic lock)</text>
+  <text x="40" y="140" class="f">status: active | archived</text>
+  <text x="40" y="156" class="f">config: ProjectConfig</text>
+  <text x="52" y="172" class="f">boundary_mode, require_overlap_review,</text>
+  <text x="52" y="188" class="f">default_import_class_key</text>
+  <text x="40" y="204" class="f">channels: ChannelDefinition[1..64]</text>
+  <text x="40" y="220" class="f">dataset_order: [dataset_id]</text>
+  <text x="40" y="236" class="f">import_history, export_history:</text>
+  <text x="52" y="252" class="f">HistoryEntry[]</text>
+
+  <!-- ChannelDefinition -->
+  <rect x="30" y="300" width="300" height="88" class="e" rx="4"/>
+  <rect x="30" y="300" width="300" height="24" fill="#4a7ab5" class="hd" rx="4"/>
+  <text x="40" y="317" class="n">ChannelDefinition</text>
+  <text x="40" y="342" class="f">key: [a-z][a-z0-9_]* (stable)</text>
+  <text x="40" y="358" class="f">label: unique, max 60 chars</text>
+  <text x="40" y="374" class="f">filename_tokens: [a-z0-9]{1,32}[]</text>
+  <path d="M180,266 L180,298" class="c"/>
+  <text x="188" y="288" class="lb">1..64, ordered</text>
+
+  <!-- ClassOntology -->
+  <rect x="30" y="430" width="300" height="196" class="e" rx="4"/>
+  <rect x="30" y="430" width="300" height="24" fill="#4a7ab5" class="hd" rx="4"/>
+  <text x="40" y="447" class="n">ClassOntology  (classes.json, v1)</text>
+  <text x="40" y="472" class="f">next_class_id</text>
+  <text x="40" y="490" class="f" font-weight="bold">ClassDefinition[]</text>
+  <text x="52" y="506" class="f">class_id: int &gt;= 1 (identity)</text>
+  <text x="52" y="522" class="f">stable_key: [a-z][a-z0-9_]*</text>
+  <text x="52" y="538" class="f">name (unique, case-insensitive)</text>
+  <text x="52" y="554" class="f">display_color: #rrggbb</text>
+  <text x="52" y="570" class="f">semantic_role: MaterialLayer |</text>
+  <text x="64" y="586" class="f">Boundary | Unspecified</text>
+  <text x="52" y="602" class="f">enabled, export_id (unique)</text>
+  <text x="52" y="618" class="f">description</text>
+  <path d="M14,160 L14,528 L28,528" stroke="#444" stroke-width="1.3" fill="none"/>
+  <path d="M28,160 L14,160" class="c"/>
+  <text x="10" y="420" class="lb" transform="rotate(-90 10,420)">1 ontology</text>
+
+  <!-- Dataset -->
+  <rect x="410" y="50" width="330" height="246" class="e" rx="4"/>
+  <rect x="410" y="50" width="330" height="24" fill="#2d6a2d" class="hd" rx="4"/>
+  <text x="420" y="67" class="n">Dataset  (dataset.json, schema v2)</text>
+  <text x="420" y="92" class="f">dataset_id: ds_&lt;hex&gt;, project_id</text>
+  <text x="420" y="108" class="f">name, pairing_key</text>
+  <text x="420" y="124" class="f">width, height (shared annotation grid)</text>
+  <text x="420" y="140" class="f">revision: int</text>
+  <text x="420" y="156" class="f">validated_revision: int | null</text>
+  <text x="420" y="172" class="f">status: ready | blocked, block_reason</text>
+  <text x="420" y="188" class="f">pairing_method: key | order | manual</text>
+  <text x="420" y="204" class="f">import_batch_id</text>
+  <text x="420" y="220" class="f">replacements: SourceReplacement[]</text>
+  <text x="432" y="236" class="f">(channel, previous/new sha256,</text>
+  <text x="432" y="252" class="f">filenames, dataset_revision_before)</text>
+  <text x="420" y="268" class="f">channels: SourceImage[1..64]</text>
+  <text x="420" y="284" class="f">(same keys and order as the project)</text>
+  <path d="M332,110 L408,110" class="c"/>
+  <text x="340" y="102" class="lb">0..n</text>
+
+  <!-- SourceImage -->
+  <rect x="410" y="330" width="330" height="152" class="e" rx="4"/>
+  <rect x="410" y="330" width="330" height="24" fill="#4b8b4b" class="hd" rx="4"/>
+  <text x="420" y="347" class="n">SourceImage</text>
+  <text x="420" y="372" class="f">channel (key), stored_filename</text>
+  <text x="420" y="388" class="f">original_filename, sha256, size_bytes</text>
+  <text x="420" y="404" class="f">width, height, dtype, bit_depth,</text>
+  <text x="420" y="420" class="f">channels, format, lossy_format</text>
+  <text x="420" y="436" class="f">calibration: pixel_size_x/y, unit,</text>
+  <text x="432" y="452" class="f">source (never invented)</text>
+  <text x="420" y="468" class="f">imported_at, metadata</text>
+  <path d="M575,298 L575,328" class="c"/>
+  <path d="M410,365 L332,365" class="r"/>
+  <text x="342" y="358" class="lb">channel</text>
+
+  <!-- RegionSet + Region -->
+  <rect x="820" y="50" width="350" height="122" class="e" rx="4"/>
+  <rect x="820" y="50" width="350" height="24" fill="#8a5a12" class="hd" rx="4"/>
+  <text x="830" y="67" class="n">RegionSet  (annotations/regions.json, v1)</text>
+  <text x="830" y="92" class="f">dataset_id</text>
+  <text x="830" y="108" class="f">next_region_seq (reg_000001, ...)</text>
+  <text x="830" y="124" class="f">overlap_reviews: {group_id: OverlapReview}</text>
+  <text x="842" y="140" class="f">state: unreviewed | reviewed_resolved |</text>
+  <text x="854" y="156" class="f">reviewed_intentional | ..._fixed_by_edit</text>
+  <path d="M742,90 L818,90" class="c"/>
+  <text x="752" y="84" class="lb">1</text>
+
+  <rect x="820" y="206" width="350" height="246" class="e" rx="4"/>
+  <rect x="820" y="206" width="350" height="24" fill="#c98a2b" class="hd" rx="4"/>
+  <text x="830" y="223" class="n">Region</text>
+  <text x="830" y="248" class="f">region_id, dataset_id</text>
+  <text x="830" y="264" class="f">class_id  (-&gt; ClassDefinition)</text>
+  <text x="830" y="280" class="f">z_order: unique, higher wins</text>
+  <text x="830" y="296" class="f">visible, locked, name</text>
+  <text x="830" y="312" class="f">coverage_rle: COCO compressed RLE</text>
+  <text x="842" y="328" class="f">{size: [H, W], counts}</text>
+  <text x="830" y="344" class="f">bbox_xywh, area</text>
+  <text x="830" y="360" class="f">source: manual | sam_proposal |</text>
+  <text x="842" y="376" class="f">tswat_import | lossy_import |</text>
+  <text x="842" y="392" class="f">boundary_fill | split | merge</text>
+  <text x="830" y="408" class="f">user_corrected, revision</text>
+  <text x="830" y="424" class="f">created_at, modified_at</text>
+  <text x="830" y="440" class="f">provenance: {tool, channel, backend...}</text>
+  <path d="M995,174 L995,204" class="c"/>
+  <text x="1003" y="194" class="lb">0..n</text>
+  <path d="M820,264 C 640,520 400,560 332,520" class="r"/>
+  <text x="560" y="520" class="lb">class_id</text>
+
+  <!-- ValidationReport -->
+  <rect x="820" y="490" width="350" height="186" class="e" rx="4"/>
+  <rect x="820" y="490" width="350" height="24" fill="#b03030" class="hd" rx="4"/>
+  <text x="830" y="507" class="n">ValidationReport  (validation/latest.json, v1)</text>
+  <text x="830" y="532" class="f">dataset_revision, project_revision</text>
+  <text x="830" y="548" class="f">status: valid | blocked</text>
+  <text x="830" y="564" class="f">blocking[], warnings[]: ValidationIssue</text>
+  <text x="842" y="580" class="f">(code, message, region/class/group ids)</text>
+  <text x="830" y="596" class="f">coverage: total/labeled/unlabeled px,</text>
+  <text x="842" y="612" class="f">overlapped px, max multiplicity</text>
+  <text x="830" y="628" class="f">class_pixel_histogram, region_count</text>
+  <text x="830" y="644" class="f">boundary_mode, require_overlap_review</text>
+  <text x="830" y="660" class="f">composition_sha256 (valid only)</text>
+  <path d="M742,250 L780,250 L780,580 L818,580" class="c"/>
+  <text x="786" y="420" class="lb">0..1</text>
+
+  <!-- Event, ExportRecord, JobRecord -->
+  <rect x="410" y="560" width="330" height="140" class="e" rx="4"/>
+  <rect x="410" y="560" width="330" height="24" fill="#7a52a8" class="hd" rx="4"/>
+  <text x="420" y="577" class="n">Event  (logs/events.jsonl, append-only)</text>
+  <text x="420" y="602" class="f">event_id, timestamp, project_id,</text>
+  <text x="420" y="618" class="f">dataset_id, operation</text>
+  <text x="420" y="634" class="f">region_ids[], class_ids[]</text>
+  <text x="420" y="650" class="f">previous_revision, new_revision</text>
+  <text x="420" y="666" class="f">source, actor</text>
+  <text x="420" y="682" class="f">provenance{}, details{}</text>
+
+  <rect x="30" y="670" width="350" height="170" class="e" rx="4"/>
+  <rect x="30" y="670" width="350" height="24" fill="#55307f" class="hd" rx="4"/>
+  <text x="40" y="687" class="n">ExportRecord  (exports/&lt;exp_id&gt;/export.json)</text>
+  <text x="40" y="712" class="f">export_id, profile_id, created_at</text>
+  <text x="40" y="728" class="f">app_version, options (boundary_policy,</text>
+  <text x="52" y="744" class="f">mask_semantics, raster_format, ...)</text>
+  <text x="40" y="760" class="f">datasets: DatasetExportEntry[] (stem,</text>
+  <text x="52" y="776" class="f">files, source_sha256, composition_sha256)</text>
+  <text x="40" y="792" class="f">skipped: SkippedDataset[] (code, reason)</text>
+  <text x="40" y="808" class="f">package_filename, package_sha256, size</text>
+  <text x="40" y="824" class="f">class_mapping[], actor</text>
+
+  <rect x="410" y="730" width="330" height="110" class="e" rx="4"/>
+  <rect x="410" y="730" width="330" height="24" fill="#555555" class="hd" rx="4"/>
+  <text x="420" y="747" class="n">JobRecord  (jobs/&lt;job_id&gt;.json)</text>
+  <text x="420" y="772" class="f">job_id, backend_id, status (queued,</text>
+  <text x="432" y="788" class="f">running, succeeded, failed, cancelled)</text>
+  <text x="420" y="804" class="f">request: SegmentRequest (channel, points,</text>
+  <text x="432" y="820" class="f">box_xyxy, previous_region_id, text)</text>
+  <text x="420" y="836" class="f">result: proposals[] + provenance</text>
+
+  <path d="M742,812 L1186,812 L1186,330 L1174,330" class="r"/>
+  <text x="760" y="806" class="lb">proposal accepted as Region (source = sam_proposal)</text>
+  <text x="826" y="712" class="lb">sam_proposal regions carry backend_id, checkpoint_sha256,</text>
+  <text x="826" y="728" class="lb">code_revision, prompts, channel and source checksum</text>
+</svg>

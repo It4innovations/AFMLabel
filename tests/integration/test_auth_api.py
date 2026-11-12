@@ -24,6 +24,9 @@ def test_unauthenticated_api_is_rejected_and_pages_redirect(anonymous_client: Te
     workspace = anonymous_client.get("/projects/proj_0000000000", follow_redirects=False)
     assert workspace.status_code == 303
 
+    help_image = anonymous_client.get("/help/images/ui-01-login.png", follow_redirects=False)
+    assert help_image.status_code == 303
+
     # Public endpoints stay reachable.
     assert anonymous_client.get("/api/v1/health").status_code == 200
     assert anonymous_client.get("/login").status_code == 200

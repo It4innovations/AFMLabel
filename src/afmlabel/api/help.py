@@ -4,8 +4,10 @@
 
 ``/help`` lists the user documentation, ``/help/<name>`` renders one
 Markdown file from the repository ``docs`` directory (or the packaged copy)
-with a minimal local converter, and ``/api/v1/help/registry`` serves the
-contextual-help registry. Nothing here contacts the network.
+with a minimal local converter, ``/help/images/<file>`` serves the raster
+images of ``docs/images`` that the documents show, and
+``/api/v1/help/registry`` serves the contextual-help registry. Nothing here
+contacts the network.
 """
 
 from __future__ import annotations
@@ -15,15 +17,22 @@ from pathlib import Path
 from typing import Any
 
 from fastapi import APIRouter, Request
-from fastapi.responses import HTMLResponse, JSONResponse
+from fastapi.responses import FileResponse, HTMLResponse, JSONResponse, Response
 
-from afmlabel.help.markdown import render_markdown
+from afmlabel.help.markdown import IMAGE_FILE, render_markdown
 from afmlabel.help.registry import load_registry, load_shortcuts
 from afmlabel.templating import templates
 
 router = APIRouter(tags=["help"])
 
 _NAME = re.compile(r"^[a-z0-9][a-z0-9_-]{0,80}$")
+_IMAGE_TYPES = {
+    ".png": "image/png",
+    ".jpg": "image/jpeg",
+    ".jpeg": "image/jpeg",
+    ".gif": "image/gif",
+    ".webp": "image/webp",
+}
 
 #: Order and titles of the Help index; only these files are served.
 HELP_INDEX: list[tuple[str, str, str]] = [
@@ -52,6 +61,18 @@ def find_doc(name: str) -> Path | None:
     return None
 
 
+def find_image(filename: str) -> Path | None:
+    """A raster image directly inside ``docs/images``; never anything else."""
+    if not IMAGE_FILE.match(filename):
+        return None
+    for directory in docs_directories():
+        images = (directory / "images").resolve()
+        candidate = (images / filename).resolve()
+        if candidate.parent == images and candidate.is_file():
+            return candidate
+    return None
+
+
 def _session(request: Request) -> Any:
     return getattr(request.state, "session", None)
 
@@ -71,6 +92,18 @@ def help_index(request: Request) -> HTMLResponse:
             "doc": None,
             "shortcuts": load_shortcuts(),
         },
+    )
+
+
+@router.get("/help/images/{filename}", response_model=None)
+def help_image(filename: str) -> Response:
+    path = find_image(filename)
+    if path is None:
+        return Response(status_code=404)
+    return FileResponse(
+        path,
+        media_type=_IMAGE_TYPES[path.suffix.lower()],
+        headers={"Cache-Control": "no-cache"},
     )
 
 

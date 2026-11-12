@@ -1,0 +1,101 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="560" viewBox="0 0 1200 560" font-family="Arial, Helvetica, sans-serif" font-size="13">
+  <title>Composition, overlap groups and the export gate</title>
+  <defs>
+    <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto">
+      <path d="M0,0 L10,5 L0,10 z" fill="#444"/>
+    </marker>
+    <pattern id="hatch" width="8" height="8" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+      <rect width="8" height="8" fill="#ffffff" fill-opacity="0"/>
+      <line x1="0" y1="0" x2="0" y2="8" stroke="#b00020" stroke-width="3"/>
+    </pattern>
+    <pattern id="dots" width="8" height="8" patternUnits="userSpaceOnUse">
+      <circle cx="4" cy="4" r="1.6" fill="#0aa"/>
+    </pattern>
+    <style>
+      .h{font-weight:bold;font-size:14px}
+      .s{font-size:12px;fill:#333}
+      .m{font-family:Consolas, 'Courier New', monospace;font-size:11.5px;fill:#222}
+      .ln{stroke:#444;stroke-width:1.5;fill:none;marker-end:url(#arr)}
+      .grid{fill:#f2f2f2;stroke:#888;stroke-width:1}
+    </style>
+  </defs>
+  <rect width="1200" height="560" fill="#ffffff"/>
+  <text x="600" y="28" text-anchor="middle" font-weight="bold" font-size="18">One class per pixel: composition (overlaps/engine.py), validation and export gate</text>
+
+  <!-- Stack of regions -->
+  <text x="30" y="62" class="h">a) Regions (independent masks)</text>
+  <g transform="translate(40,80)">
+    <rect x="0" y="0" width="200" height="200" class="grid"/>
+    <path d="M0,0 H200 V200 H0 Z M30,120 V160 H80 V120 Z" fill="#4c78a8" fill-opacity="0.85" fill-rule="evenodd"/>
+    <text x="8" y="190" fill="#fff" font-size="12">z1 Substrate (fill)</text>
+    <polygon points="110,20 190,10 170,90 120,95" fill="#f58518" fill-opacity="0.95"/>
+    <text x="128" y="84" font-size="12" font-weight="bold">z2 Grain B</text>
+    <circle cx="125" cy="40" r="22" fill="#e45756" fill-opacity="0.95"/>
+    <text x="96" y="118" font-size="12" font-weight="bold" fill="#fff">z3 Particle</text>
+    <path d="M125,62 L125,105" stroke="#333" stroke-width="1"/>
+    <rect x="30" y="120" width="50" height="40" fill="url(#dots)" stroke="#0aa"/>
+    <text x="22" y="176" font-size="11" fill="#fff" font-weight="bold">hole = unlabelled</text>
+  </g>
+  <text x="40" y="306" class="s">Composable = visible and class enabled.</text>
+  <text x="40" y="322" class="s">Regions are applied in ascending z-order;</text>
+  <text x="40" y="338" class="s">the highest z wins (top of the Regions list).</text>
+
+  <path d="M262,180 L318,180" class="ln"/>
+
+  <!-- rasters -->
+  <text x="330" y="62" class="h">b) Rasters computed from the region set</text>
+  <g transform="translate(330,80)">
+    <rect x="0" y="0" width="160" height="160" fill="#4c78a8"/>
+    <polygon points="88,16 152,8 136,72 96,76" fill="#f58518"/>
+    <circle cx="100" cy="32" r="17.6" fill="#e45756"/>
+    <rect x="24" y="96" width="40" height="32" fill="#000"/>
+    <text x="0" y="178" class="m">label_map (int32)</text>
+    <text x="0" y="192" class="m">class id; 0 = unlabelled</text>
+  </g>
+  <g transform="translate(510,80)">
+    <rect x="0" y="0" width="160" height="160" fill="#e8e8e8" stroke="#888"/>
+    <polygon points="88,16 152,8 136,72 96,76" fill="#bdbdbd"/>
+    <circle cx="100" cy="32" r="17.6" fill="url(#hatch)" stroke="#b00020"/>
+    <rect x="24" y="96" width="40" height="32" fill="#fff" stroke="#999"/>
+    <text x="0" y="178" class="m">multiplicity (uint16)</text>
+    <text x="0" y="192" class="m">&gt;1 = overlapped</text>
+  </g>
+  <g transform="translate(690,80)">
+    <rect x="0" y="0" width="160" height="160" fill="#f7f7f7" stroke="#888"/>
+    <circle cx="100" cy="32" r="17.6" fill="none" stroke="#b00020" stroke-width="2.5"/>
+    <text x="78" y="64" font-size="11" fill="#b00020">ovl_&lt;digest&gt;</text>
+    <rect x="24" y="96" width="40" height="32" fill="url(#dots)" stroke="#0aa" stroke-width="2"/>
+    <text x="10" y="148" font-size="11" fill="#007a7a">missing component</text>
+    <text x="0" y="178" class="m">overlap groups, missing</text>
+    <text x="0" y="192" class="m">components (4-connected)</text>
+  </g>
+  <text x="330" y="306" class="s">Overlap group id = SHA-256 of sorted participant ids + packed pixel set: stable under z-order changes, new as soon</text>
+  <text x="330" y="322" class="s">as the overlapping pixels change, so a review never silently survives a coverage edit (stale reviews are pruned).</text>
+  <text x="330" y="338" class="s">Composition hash = SHA-256 of label_map as little-endian int32 bytes (deterministic; stored by Validate).</text>
+
+  <!-- validation -->
+  <rect x="880" y="60" width="290" height="230" rx="8" fill="#fff5e6" stroke="#c98a2b"/>
+  <text x="894" y="84" class="h">c) validate() - never mutates</text>
+  <text x="894" y="106" class="s">blocking codes:</text>
+  <text x="904" y="124" class="m">OVERLAP_UNREVIEWED (if required)</text>
+  <text x="904" y="140" class="m">UNLABELED_PIXELS</text>
+  <text x="904" y="156" class="m">REGION_HIDDEN</text>
+  <text x="904" y="172" class="m">CLASS_REFERENCE_INVALID</text>
+  <text x="904" y="188" class="m">BOUNDARY_POLICY_VIOLATION</text>
+  <text x="904" y="204" class="m">PAIR_MISSING_IMAGE / _DIMENSION_...</text>
+  <text x="904" y="220" class="m">EXPORT_PROFILE_INVALID (ids)</text>
+  <text x="904" y="236" class="m">VALIDATION_FAILED (invariant)</text>
+  <text x="894" y="258" class="s">valid only if no blocking issue; then</text>
+  <text x="894" y="274" class="s">label_map has no 0 and only known ids.</text>
+  <path d="M852,160 L878,160" class="ln"/>
+
+  <!-- export gate -->
+  <rect x="30" y="380" width="1140" height="160" rx="8" fill="#f4eefa" stroke="#7a52a8"/>
+  <text x="46" y="404" class="h">d) Export gate and transformation (exports/service.py: ExportService._exact)</text>
+  <text x="46" y="428" class="s">Skipped with a reason code unless: report exists (VALIDATION_MISSING), report.dataset_revision == dataset.revision == validated_revision (VALIDATION_STALE),</text>
+  <text x="46" y="446" class="s">status valid (VALIDATION_FAILED), recomposed SHA-256 == stored composition_sha256 (VALIDATION_STALE), no 0 pixel (UNLABELED_PIXELS).</text>
+  <text x="46" y="472" class="s">Then: class id -&gt; export id (export_id or class_id, unique); instance map = one id per winning region in z-order (table in the manifest);</text>
+  <text x="46" y="490" class="s">Boundary policy "zero" sets Boundary-role pixels to 0 in both maps (the only way 0 can appear); values must fit uint16; written losslessly</text>
+  <text x="46" y="508" class="s">as uncompressed TIFF or PNG; the colour mask is rendered from the class label map with the exact display colours (legend in the manifest).</text>
+  <text x="46" y="528" class="s">Profiles only transform this exact representation: NanoUNet (loader layout, 8-bit channel renders) or native exact (masks, source copies, regions, validation).</text>
+</svg>

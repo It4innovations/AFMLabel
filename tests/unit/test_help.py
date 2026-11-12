@@ -9,7 +9,7 @@ import json
 import re
 from pathlib import Path
 
-from afmlabel.help.markdown import render_markdown, rewrite_link, slugify
+from afmlabel.help.markdown import image_src, render_markdown, rewrite_link, slugify
 from afmlabel.help.registry import (
     REGISTRY_FILE,
     load_registry,
@@ -172,6 +172,40 @@ def test_markdown_escapes_html_and_rejects_script_links() -> None:
     rendered = render_markdown("<script>alert(1)</script> [x](javascript:alert(1))")
     assert "<script>" not in rendered.html
     assert 'href="#"' in rendered.html
+
+
+def test_markdown_renders_local_images_and_drops_others_to_alt_text() -> None:
+    rendered = render_markdown(
+        "![Sign-in page](images/ui_01_login.png)\n\n*Sign-in page.*\n\n"
+        "Remote ![logo](https://x.y/logo.png), vector ![diagram](images/arch.svg), "
+        'outside ![up](../secret.png) and ![q"<x>](images/a.png).'
+    )
+    out = rendered.html
+    assert (
+        '<p class="lv-help-figure"><img src="/help/images/ui_01_login.png" '
+        'alt="Sign-in page" loading="lazy" /></p>'
+    ) in out
+    # File names with underscores are not touched by the emphasis rule.
+    assert "<em>01</em>" not in out
+    assert "<p><em>Sign-in page.</em></p>" in out
+    assert "Remote logo, vector diagram, outside up and " in out
+    assert "https://x.y" not in out and "arch.svg" not in out and "secret.png" not in out
+    assert 'alt="q&quot;&lt;x&gt;"' in out and "<x>" not in out
+    assert image_src("images/a.png") == "/help/images/a.png"
+    assert image_src("./images/a.JPG") == "/help/images/a.JPG"
+    for bad in ("images/../a.png", "images/sub/a.png", "/images/a.png", "images/a.svg", "a.png"):
+        assert image_src(bad) is None, bad
+
+
+def test_every_user_guide_image_is_served_and_shown_once() -> None:
+    source = (REPO / "docs" / "user-guide.md").read_text(encoding="utf-8")
+    html = render_markdown(source).html
+    sources = re.findall(r'<img src="/help/images/([^"]+)"', html)
+    assert len(sources) == source.count("![") and sources
+    for name in sources:
+        assert (REPO / "docs" / "images" / name).is_file(), name
+    paragraphs = re.findall(r"<p>(.*?)</p>", html)
+    assert {p for p in paragraphs if paragraphs.count(p) > 1} == set()
 
 
 def test_slugify_and_link_rewrite() -> None:

@@ -1656,6 +1656,23 @@ summary:focus-visible {
   font-weight: 500;
 }
 
+.lv-help-figure {
+  margin: 14px 0 4px;
+}
+
+.lv-help-article img {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  border: 1px solid var(--lv-border-light);
+  border-radius: var(--lv-radius);
+}
+
+.lv-help-figure + p > em:only-child {
+  color: var(--lv-text-secondary);
+  font-size: 13px;
+}
+
 .lv-help-article blockquote {
   margin: 10px 0;
   padding: 6px 14px;
