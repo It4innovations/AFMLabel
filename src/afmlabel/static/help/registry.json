@@ -80,6 +80,12 @@
       "kind": "navigation",
       "docs": "user-guide"
     },
+    "project.about": {
+      "screen": "Shell",
+      "label": "About",
+      "short": "Show the project README: installation, configuration, licence and acknowledgements. No network needed.",
+      "kind": "navigation"
+    },
     "dataset.search": {
       "screen": "Project",
       "label": "Search datasets",

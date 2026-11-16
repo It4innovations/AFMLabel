@@ -199,3 +199,7 @@ respective licences.
 
 This work was supported by the Ministry of Education, Youth and Sports of
 the Czech Republic through the e-INFRA CZ (ID:90254).
+
+[![TWIST Programme, Ministry of Industry and Trade](src/afmlabel/static/img/twist_logo_with_czech_subtitle.png)](https://mpo.gov.cz/)
+
+This software AFMLabel was created with state support of the Ministry of Industry and Trade within the TWIST Programme, Project No. FY01010025 (Research and development of advanced analysis and interpretation of atomic force microscopy (AFM) data using artificial intelligence and machine learning).

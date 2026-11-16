@@ -160,6 +160,23 @@ a:hover {
   display: block;
 }
 
+/* Two logos side by side share one separator (after the last one). */
+.lv-brand-joined {
+  padding-right: 12px;
+  margin-right: 0;
+  border-right: 0;
+}
+
+/* The TWIST asset (2172x724) has dark lettering on a transparent
+   background, so it sits on a white plate to stay legible in the dark
+   theme. */
+.lv-brand-logo-twist {
+  height: 34px;
+  padding: 2px 6px;
+  background: #ffffff;
+  border-radius: var(--lv-radius);
+}
+
 .lv-logo {
   display: flex;
   align-items: center;
@@ -1666,6 +1683,13 @@ summary:focus-visible {
   height: auto;
   border: 1px solid var(--lv-border-light);
   border-radius: var(--lv-radius);
+}
+
+/* About page (README.md): the only images are sponsor logos. */
+.lv-about-article img {
+  max-width: min(320px, 100%);
+  padding: 8px 12px;
+  background: #ffffff;
 }
 
 .lv-help-figure + p > em:only-child {

@@ -32,7 +32,7 @@ _STATIC_DIR = Path(__file__).parent.parent / "static"
 
 #: Navigation links (plain anchors the user may click) that are acceptable;
 #: nothing is *loaded* from them.
-_KNOWN_NAVIGATION_HOSTS = ("blender.it4i.cz", "code.it4i.cz")
+_KNOWN_NAVIGATION_HOSTS = ("blender.it4i.cz", "code.it4i.cz", "www.it4i.cz", "mpo.gov.cz")
 
 #: Environment variables that switch third-party libraries into offline or
 #: no-telemetry mode; reported so an operator can verify the deployment.

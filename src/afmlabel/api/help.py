@@ -5,7 +5,8 @@
 ``/help`` lists the user documentation, ``/help/<name>`` renders one
 Markdown file from the repository ``docs`` directory (or the packaged copy)
 with a minimal local converter, ``/help/images/<file>`` serves the raster
-images of ``docs/images`` that the documents show, and
+images of ``docs/images`` that the documents show, ``/about`` renders the
+project ``README.md``, and
 ``/api/v1/help/registry`` serves the contextual-help registry. Nothing here
 contacts the network.
 """
@@ -13,12 +14,14 @@ contacts the network.
 from __future__ import annotations
 
 import re
+from importlib.metadata import PackageNotFoundError, metadata
 from pathlib import Path
 from typing import Any
 
 from fastapi import APIRouter, Request
 from fastapi.responses import FileResponse, HTMLResponse, JSONResponse, Response
 
+from afmlabel import __version__
 from afmlabel.help.markdown import IMAGE_FILE, render_markdown
 from afmlabel.help.registry import load_registry, load_shortcuts
 from afmlabel.templating import templates
@@ -150,6 +153,45 @@ def help_page(name: str, request: Request) -> HTMLResponse:
                 "missing": False,
             },
             "shortcuts": load_shortcuts(),
+        },
+    )
+
+
+_STATIC_IMAGE = re.compile(r"^(?:\./)?src/afmlabel/static/img/([^/]+)$")
+
+
+def readme_image_src(target: str) -> str | None:
+    """README images live in the packaged ``static/img``; map them there."""
+    match = _STATIC_IMAGE.match(target)
+    if match and IMAGE_FILE.match(match.group(1)):
+        return f"/static/img/{match.group(1)}"
+    return None
+
+
+def load_readme() -> str | None:
+    """The repository ``README.md``, or the copy in the installed metadata."""
+    readme = Path(__file__).resolve().parents[3] / "README.md"
+    if readme.is_file():
+        return readme.read_text(encoding="utf-8")
+    try:
+        description = metadata("afmlabel").get_payload()  # type: ignore[attr-defined]
+    except PackageNotFoundError:
+        return None
+    return description if isinstance(description, str) and description.strip() else None
+
+
+@router.get("/about", response_class=HTMLResponse)
+def about_page(request: Request) -> HTMLResponse:
+    source = load_readme()
+    rendered = render_markdown(source, readme_image_src) if source else None
+    return templates.TemplateResponse(
+        request,
+        "about.html",
+        {
+            "session": _session(request),
+            "version": __version__,
+            "html": rendered.html if rendered else "",
+            "headings": [h for h in rendered.headings if 2 <= h.level <= 3] if rendered else [],
         },
     )
 

@@ -15,11 +15,18 @@
 <body {% block body_attrs %}{% endblock %}>
   {% block header %}
   <header class="lv-header">
-    <a class="lv-brand" href="https://blender.it4i.cz/" target="_blank" rel="noopener">
+    <a class="lv-brand lv-brand-joined" href="https://www.it4i.cz/" target="_blank" rel="noopener">
       <img
         class="lv-brand-logo"
         src="{{ asset_url('img/it4i-logo.png') }}"
         alt="IT4Innovations"
+      />
+    </a>
+    <a class="lv-brand" href="https://mpo.gov.cz/" target="_blank" rel="noopener">
+      <img
+        class="lv-brand-logo lv-brand-logo-twist"
+        src="{{ asset_url('img/twist_logo_with_czech_subtitle.png') }}"
+        alt="TWIST Programme, Ministry of Industry and Trade"
       />
     </a>
     <span class="lv-logo">AFMLabel</span>
@@ -29,6 +36,7 @@
     <div class="lv-header-right">
       {% block header_right %}{% endblock %}
       <a class="lv-btn lv-btn-text" id="open-help-button" href="/help" data-help="project.help">Help</a>
+      <a class="lv-btn lv-btn-text" id="open-about-button" href="/about" data-help="project.about">About</a>
       <button type="button" class="lv-btn lv-btn-text" id="open-system-status-button" data-help="project.system_status">System status</button>
       <button type="button" class="lv-btn lv-btn-text lv-btn-icon lv-theme-toggle" id="theme-toggle" data-help="project.theme"></button>
     </div>

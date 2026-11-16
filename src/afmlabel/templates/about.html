@@ -1,0 +1,33 @@
+{# SPDX-License-Identifier: MIT
+   Copyright (c) 2026 IT4Innovations, VSB-Technical University of Ostrava #}
+{% extends "base.html" %}
+{% block title %}About{% endblock %}
+{% block nav %}<a href="/">Projects</a><a href="/about" class="active">About</a>{% endblock %}
+{% block header_right %}
+  {% if session %}<span class="lv-user" id="current-user">{{ session.username }}</span>
+  <button type="button" class="lv-btn lv-btn-text" id="logout-button">Sign out</button>{% endif %}
+{% endblock %}
+{% block body_attrs %}id="about-body"{% endblock %}
+
+{% block content %}
+<main class="lv-page lv-help-page">
+  <aside class="lv-help-sidebar" aria-label="About contents">
+    <h2 class="lv-section-heading">About</h2>
+    <p class="lv-hint">The project <code>README.md</code>, version {{ version }}. No network access is needed.</p>
+    {% if headings %}
+    <h3 class="lv-help-toc-title">On this page</h3>
+    <ul class="lv-help-toc">
+      {% for h in headings %}<li class="lv-help-toc-{{ h.level }}"><a href="#{{ h.anchor }}">{{ h.text }}</a></li>{% endfor %}
+    </ul>
+    {% endif %}
+  </aside>
+  <article class="lv-help-article lv-about-article" id="about-article">
+    {% if html %}
+      {{ html | safe }}
+    {% else %}
+      <h1>AFMLabel</h1>
+      <p>The <code>README.md</code> file is not available in this installation.</p>
+    {% endif %}
+  </article>
+</main>
+{% endblock %}

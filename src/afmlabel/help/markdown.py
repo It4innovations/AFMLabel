@@ -18,6 +18,7 @@ from __future__ import annotations
 
 import html
 import re
+from collections.abc import Callable
 from dataclasses import dataclass, field
 
 _HEADING = re.compile(r"^(#{1,6})\s+(.*?)\s*#*\s*$")
@@ -39,6 +40,10 @@ _ITALIC = re.compile(
     r"(?<![\w*])\*(?!\s)(.+?)(?<!\s)\*(?![\w*])|(?<![\w_])_(?!\s)(.+?)(?<!\s)_(?![\w_])"
 )
 _MD_LINK = re.compile(r"^(?:\./)?([A-Za-z0-9_\-./]+?)\.md(#[A-Za-z0-9_\-]+)?$")
+
+
+#: Maps a Markdown image target to a local URL, or None to show the alt text.
+ImageResolver = Callable[[str], str | None]
 
 
 def slugify(text: str) -> str:
@@ -68,14 +73,14 @@ def image_src(target: str) -> str | None:
     return None
 
 
-def render_inline(text: str) -> str:
+def render_inline(text: str, image_resolver: ImageResolver = image_src) -> str:
     # Images become placeholders first, so neither the alt text nor the file
     # name is touched by the code/link/emphasis rules below.
     images: list[str] = []
 
     def image(match: re.Match[str]) -> str:
         alt = html.unescape(match.group(1))
-        src = image_src(html.unescape(match.group(2)))
+        src = image_resolver(html.unescape(match.group(2)))
         if src is None:
             images.append(html.escape(alt, quote=False))
         else:
@@ -116,7 +121,10 @@ class Rendered:
     headings: list[Heading] = field(default_factory=list)
 
 
-def render_markdown(source: str) -> Rendered:
+def render_markdown(source: str, image_resolver: ImageResolver = image_src) -> Rendered:
+    def inline(text: str) -> str:
+        return render_inline(text, image_resolver)
+
     lines = source.splitlines()
     out: list[str] = []
     headings: list[Heading] = []
@@ -135,7 +143,7 @@ def render_markdown(source: str) -> Rendered:
             # A paragraph holding only images is a figure; its caption follows.
             figure = _IMAGE.search(text) is not None and not _IMAGE.sub("", text).strip()
             css = ' class="lv-help-figure"' if figure else ""
-            out.append(f"<p{css}>{render_inline(text)}</p>")
+            out.append(f"<p{css}>{inline(text)}</p>")
             paragraph = []
 
     def close_lists(to_indent: int = -1) -> None:
@@ -182,7 +190,7 @@ def render_markdown(source: str) -> Rendered:
             headings.append(Heading(level=level, text=re.sub(r"`", "", text), anchor=anchor))
             if not title and level == 1:
                 title = re.sub(r"`", "", text)
-            out.append(f'<h{level} id="{anchor}">{render_inline(text)}</h{level}>')
+            out.append(f'<h{level} id="{anchor}">{inline(text)}</h{level}>')
             index += 1
             continue
         if stripped in ("---", "***", "___"):
@@ -198,7 +206,7 @@ def render_markdown(source: str) -> Rendered:
             while index < len(lines) and lines[index].strip().startswith(">"):
                 quote.append(lines[index].strip()[1:].strip())
                 index += 1
-            out.append(f"<blockquote><p>{render_inline(' '.join(quote))}</p></blockquote>")
+            out.append(f"<blockquote><p>{inline(' '.join(quote))}</p></blockquote>")
             continue
         if "|" in stripped and index + 1 < len(lines) and _TABLE_SEP.match(lines[index + 1]):
             flush_paragraph()
@@ -210,10 +218,10 @@ def render_markdown(source: str) -> Rendered:
                 rows.append([c.strip() for c in lines[index].strip().strip("|").split("|")])
                 index += 1
             out.append('<div class="lv-help-table"><table>')
-            out.append("<thead><tr>" + "".join(f"<th>{render_inline(c)}</th>" for c in header))
+            out.append("<thead><tr>" + "".join(f"<th>{inline(c)}</th>" for c in header))
             out.append("</tr></thead><tbody>")
             for row in rows:
-                out.append("<tr>" + "".join(f"<td>{render_inline(c)}</td>" for c in row) + "</tr>")
+                out.append("<tr>" + "".join(f"<td>{inline(c)}</td>" for c in row) + "</tr>")
             out.append("</tbody></table></div>")
             continue
         item = _UL.match(line) or _OL.match(line)
@@ -221,7 +229,7 @@ def render_markdown(source: str) -> Rendered:
             flush_paragraph()
             indent = len(item.group(1).replace("	", "    "))
             tag = "ul" if _UL.match(line) else "ol"
-            content = render_inline(item.group(2))
+            content = inline(item.group(2))
             if list_stack and list_stack[-1][1] == indent:
                 out[-1] += f"</li><li>{content}"
             elif not list_stack or indent > list_stack[-1][1]:
@@ -249,7 +257,7 @@ def render_markdown(source: str) -> Rendered:
                 and not _FENCE.match(lines[index])
                 and lines[index].startswith(" ")
             ):
-                out[-1] += " " + render_inline(lines[index].strip())
+                out[-1] += " " + inline(lines[index].strip())
                 index += 1
             continue
         if list_stack:

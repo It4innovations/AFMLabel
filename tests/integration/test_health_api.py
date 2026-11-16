@@ -70,6 +70,21 @@ def test_unknown_route_uses_error_envelope(api_client: TestClient) -> None:
     assert response.json()["error"]["code"] == "NOT_FOUND"
 
 
+def test_about_page_renders_the_readme(api_client: TestClient) -> None:
+    page = api_client.get("/about")
+    assert page.status_code == 200
+    html = page.text
+    assert '<h2 id="acknowledgements">Acknowledgements</h2>' in html
+    # The README logo is served from the packaged static images and links out.
+    assert (
+        '<a href="https://mpo.gov.cz/" rel="noopener" target="_blank">'
+        '<img src="/static/img/twist_logo_with_czech_subtitle.png"'
+    ) in html
+    logo = api_client.get("/static/img/twist_logo_with_czech_subtitle.png")
+    assert logo.status_code == 200
+    assert logo.headers["content-type"] == "image/png"
+
+
 def test_index_page_and_static_assets_are_local(api_client: TestClient) -> None:
     page = api_client.get("/")
     assert page.status_code == 200
@@ -78,9 +93,13 @@ def test_index_page_and_static_assets_are_local(api_client: TestClient) -> None:
     for url in re.findall(r"""(?:src|href)=["']([^"']+)""", html):
         if url.startswith("http"):
             host = urlsplit(url).hostname
-            # Assets are served from this host; the only external URL is the
-            # navigation link on the IT4I brand logo (nothing is loaded from it).
-            assert host in ("testserver", "blender.it4i.cz"), url
+            # Assets are served from this host; the only external URLs are the
+            # navigation links on the brand logos (nothing is loaded from them).
+            assert host in ("testserver", "www.it4i.cz", "mpo.gov.cz"), url
+    assert 'href="https://www.it4i.cz/"' in html
+    assert 'href="https://mpo.gov.cz/"' in html
+    assert "img/twist_logo_with_czech_subtitle.png" in html
+    assert 'href="/about"' in html
     css = api_client.get("/static/css/app.css")
     assert css.status_code == 200
     assert css.headers["content-type"].startswith("text/css")
