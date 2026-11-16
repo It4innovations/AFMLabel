@@ -98,7 +98,7 @@ def test_index_page_and_static_assets_are_local(api_client: TestClient) -> None:
             assert host in ("testserver", "www.it4i.cz", "mpo.gov.cz"), url
     assert 'href="https://www.it4i.cz/"' in html
     assert 'href="https://mpo.gov.cz/"' in html
-    assert "img/twist_logo_with_czech_subtitle.png" in html
+    assert "img/twist_logo_with_czech_subtitle_gray.png" in html
     assert 'href="/about"' in html
     css = api_client.get("/static/css/app.css")
     assert css.status_code == 200

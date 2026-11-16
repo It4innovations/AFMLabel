@@ -167,14 +167,11 @@ a:hover {
   border-right: 0;
 }
 
-/* The TWIST asset (2172x724) has dark lettering on a transparent
-   background, so it sits on a white plate to stay legible in the dark
-   theme. */
+/* The TWIST asset (2172x724, transparent) is the original logo with its
+   black subtitle recoloured to mid grey so it reads on both the dark and
+   the light header. */
 .lv-brand-logo-twist {
   height: 34px;
-  padding: 2px 6px;
-  background: #ffffff;
-  border-radius: var(--lv-radius);
 }
 
 .lv-logo {
